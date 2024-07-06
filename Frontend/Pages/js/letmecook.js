@@ -1,4 +1,5 @@
 var isNavToggled = false;
+var counter = 0;
 
 function onNavToggleBtnClick(clickEvent) {
     var navBar = document.getElementById("nav");
@@ -17,4 +18,9 @@ function onNavToggleBtnClick(clickEvent) {
             navBtnRects[i].classList.remove("open");
         }
     }
+}
+
+function calendarLayout() {
+    console.log("shes a burden for " + counter + "times");
+    counter++;
 }
