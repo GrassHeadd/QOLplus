@@ -43,9 +43,12 @@ function panelResizeListener(leftPanelMinWidthPerc = 30, leftPanelMaxWidthPerc =
 
     resizer.addEventListener("mousedown", (mouseEvent) => { isDraggingDivider = true; });
     document.addEventListener("mouseup", (mouseEvent) => { isDraggingDivider = false; });
-    document.addEventListener("mousemove", (mouseEvent) => {
+    resizer.addEventListener("touchstart", (mouseEvent) => { isDraggingDivider = true; });
+    document.addEventListener("touchend", (mouseEvent) => { isDraggingDivider = false; });
+
+    document.addEventListener("mousemove", (event) => {
         if (!isDraggingDivider) return;
-        mouseEvent.preventDefault();
+        event.preventDefault();
         const mainPanelWidth = parseInt(document.defaultView.getComputedStyle(mainPanel).width);
         
         /*
@@ -55,6 +58,19 @@ function panelResizeListener(leftPanelMinWidthPerc = 30, leftPanelMaxWidthPerc =
 
             #3: document.documentElement.clientWidth / 10 is equal to "10vw" (clientWidth = 100vw). This value is subtracted to ensure the left margin of the main panel is taken into account
         */ 
-        leftPanel.style.width = Math.min(Math.max(((mouseEvent.clientX - document.documentElement.clientWidth / 10) * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
+        leftPanel.style.width = Math.min(Math.max(((event.clientX - document.documentElement.clientWidth / 10) * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
+    });
+    document.addEventListener("touchmove", (event) => {
+        if (!isDraggingDivider) return;
+        const mainPanelWidth = parseInt(document.defaultView.getComputedStyle(mainPanel).width);
+        
+        /*
+            #1: Math.min(Math.max(x, minBound), maxBound) performs a clamp so the returned value is always within the boundaries
+
+            #2: mouseEvent.clientX returns how many px the cursor is from left of screen
+
+            #3: document.documentElement.clientWidth / 10 is equal to "10vw" (clientWidth = 100vw). This value is subtracted to ensure the left margin of the main panel is taken into account
+        */ 
+        leftPanel.style.width = Math.min(Math.max(((event.touches.item(0).clientX - document.documentElement.clientWidth / 10) * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
     });
 }
