@@ -33,13 +33,11 @@ function calendarLayout() {
 /**
  * Controls the resizing behaviour of the left and right windows in the main panel
  * 
- * Issue: If resizing is too fast, cursor will highlight text it moves over briefly
- * 
  * @param {Number} leftPanelMinWidthPerc The minimum width (in %) that the left panel can have
  * @param {Number} leftPanelMaxWidthPerc The maximum width (in %) that the left panel can have
  */
 function panelResizeListener(leftPanelMinWidthPerc = 30, leftPanelMaxWidthPerc = 80) {
-    const mainPanel = document.getElementById("mainArea").getElementsByClassName("main")[0], leftPanel = mainPanel.getElementsByClassName("left")[0], resizer = mainPanel.getElementsByClassName("resizer")[0];
+    const mainPanel = document.getElementById("main"), leftPanel = mainPanel.getElementsByClassName("left")[0], resizer = mainPanel.getElementsByClassName("resizer")[0];
 
     resizer.addEventListener("mousedown", (mouseEvent) => { isDraggingDivider = true; });
     document.addEventListener("mouseup", (mouseEvent) => { isDraggingDivider = false; });

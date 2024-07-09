@@ -65,31 +65,33 @@ body {
     left: 0;
 }
 
-#mainArea {
+#main {
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    border: 1px solid #bebebe;
+    border-radius: 1em;
+    box-shadow: 0 5px 10px 10px #d9d9d9;
 }
 
-#mainArea .main {
-    width: calc(100% - 20vw);
-    height: calc(100% - 10vw);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#mainArea .main .resizer {
+#main .resizer {
     position: relative;
-    width: 10px;
+    width: 8px;
     height: 100%;
     background-color: #787e87;
     cursor: col-resize;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-#mainArea .main .resizer .handle {
+#main .resizer .handle {
     position: absolute;
     top: calc(50% - 7.5px);
     left: calc(50% - 2px);
@@ -100,47 +102,47 @@ body {
     border-bottom: none;
  }
 
-#mainArea .main .left {
+#main .left {
     width: 30%;
     height: 100%;
     background-color: rgb(219, 206, 143);
 }
 
-#mainArea .main .right {
+#main .right {
     flex: 1;
     height: 100%;
-    background-color: rgba(0, 255, 255, 0.57);
+    /* background-color: rgba(0, 255, 255, 0.57); */
 }
 
-#mainArea .main .right .top {
+#main .right .top {
     width: 100%;
     height: 100px;
-    background-color: rgba(66, 118, 31, 0.57);
+    /* background-color: rgba(66, 118, 31, 0.57); */
 }
 
-#mainArea .main .right .bottom {
+#main .right .bottom {
     width: 100%;
     height: calc(100% - 100px);
-    background-color: #11e651
+    /* background-color: #aeaeae; */
 }
 
-#mainArea .main .right .bottom .header {
+#main .right .bottom .header {
     width: 100%;
     height: 30px;
-    background-color: #aae611;
+    background-color: #ffffff;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
-#mainArea .main .right .bottom .header .dayName {
-    /* text-align: center; */
+#main .right .bottom .header .dayName {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
-    border: 1px solid black;
+    margin-right: 10px;
+    /* border: 1px solid rgb(216, 216, 216); */
 }
 
-#mainArea .main .right .bottom .weekContainer {
+#main .right .bottom .weekContainer {
     width: 100%;
     height: calc(100% - 30px);
     display: grid;
@@ -148,8 +150,10 @@ body {
     grid-template-rows: repeat(5, minmax(0, 1fr));
 }
 
-#mainArea .main .right .weekContainer .day {
-    border: 1px solid black;
-    padding-left: 5px;
+#main .right .weekContainer .day {
+    border: 1px solid rgb(216, 216, 216);
+    display: flex;
+    justify-content: flex-end;
     padding-top: 5px;
+    padding-right: 10px;
 }
