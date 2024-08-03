@@ -25,19 +25,14 @@ function onNavToggleBtnClick(clickEvent) {
     }
 }
 
-function calendarLayout() {
-    console.log("shes a burden for " + counter + "times");
-    counter++;
-}
-
 /**
  * Controls the resizing behaviour of the left and right windows in the main panel
  * 
  * @param {Number} leftPanelMinWidthPerc The minimum width (in %) that the left panel can have
  * @param {Number} leftPanelMaxWidthPerc The maximum width (in %) that the left panel can have
  */
-function panelResizeListener(leftPanelMinWidthPerc = 30, leftPanelMaxWidthPerc = 80) {
-    const mainPanel = document.getElementById("main"), leftPanel = mainPanel.getElementsByClassName("left")[0], resizer = mainPanel.getElementsByClassName("resizer")[0];
+function panelResizeListener(leftPanelMinWidthPerc = 20, leftPanelMaxWidthPerc = 80) {
+    const mainPanel = document.getElementById("main"), leftPanel = mainPanel.getElementsByClassName("inspector")[0], resizer = mainPanel.getElementsByClassName("resizer")[0];
 
     resizer.addEventListener("mousedown", (mouseEvent) => { isDraggingDivider = true; });
     document.addEventListener("mouseup", (mouseEvent) => { isDraggingDivider = false; });
@@ -53,10 +48,8 @@ function panelResizeListener(leftPanelMinWidthPerc = 30, leftPanelMaxWidthPerc =
             #1: Math.min(Math.max(x, minBound), maxBound) performs a clamp so the returned value is always within the boundaries
 
             #2: mouseEvent.clientX returns how many px the cursor is from left of screen
-
-            #3: document.documentElement.clientWidth / 10 is equal to "10vw" (clientWidth = 100vw). This value is subtracted to ensure the left margin of the main panel is taken into account
         */ 
-        leftPanel.style.width = Math.min(Math.max(((event.clientX - document.documentElement.clientWidth / 10) * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
+        leftPanel.style.width = Math.min(Math.max((event.clientX * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
     });
     document.addEventListener("touchmove", (event) => {
         if (!isDraggingDivider) return;
@@ -66,9 +59,7 @@ function panelResizeListener(leftPanelMinWidthPerc = 30, leftPanelMaxWidthPerc =
             #1: Math.min(Math.max(x, minBound), maxBound) performs a clamp so the returned value is always within the boundaries
 
             #2: mouseEvent.clientX returns how many px the cursor is from left of screen
-
-            #3: document.documentElement.clientWidth / 10 is equal to "10vw" (clientWidth = 100vw). This value is subtracted to ensure the left margin of the main panel is taken into account
         */ 
-        leftPanel.style.width = Math.min(Math.max(((event.touches.item(0).clientX - document.documentElement.clientWidth / 10) * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
+        leftPanel.style.width = Math.min(Math.max((event.touches.item(0).clientX * 100 / mainPanelWidth), leftPanelMinWidthPerc), leftPanelMaxWidthPerc) + "%";
     });
 }
