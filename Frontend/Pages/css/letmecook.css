@@ -3,7 +3,6 @@
     padding: 0;
 }
 
-/*=== Side Navigation Bar ===*/
 button {
     border: none;
     background-color: transparent;
@@ -14,6 +13,8 @@ body {
     height: 100vh;
 }
 
+
+/*=== Side Navigation Bar ===*/
 #navToggleBtn {
     position: fixed;
     z-index: 2;
@@ -76,6 +77,7 @@ body {
     box-shadow: 0 5px 10px 10px #d9d9d9;
 }
 
+/*=== Resizer ===*/
 #main .resizer {
     position: relative;
     width: 10px;
@@ -101,12 +103,120 @@ body {
     border-bottom: none;
 }
 
+/*=== Left Inspector Panel ===*/
 #main .inspector {
     width: 30%;
     height: 100%;
     background-color: rgb(232, 232, 232);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
+#main .inspector .qotd {
+    background-color: white;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#main .inspector .qotd .footnote {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    color: rgb(167, 167, 167);
+    font-style: italic;
+    font-size: 12px;
+}
+
+#main .inspector .qotd .content {
+    font-family: "Gloria Hallelujah", cursive;
+    font-weight: 800;
+    font-style: normal;
+    font-size: 3em;
+}
+
+#main .inspector .focusAreaTabs {
+    background-color: darkcyan;
+    margin-right: 3em;
+    height: 55px;
+    display: flex;
+}
+
+#main .inspector .focusAreaTabs .focusArea {
+    flex: 1;
+    border-top-right-radius: 1em;
+}
+
+#main .inspector .itinerary {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    padding: 25px 0;
+    background-color: #E1B8BE;
+}
+
+#main .inspector .itinerary .item {
+    width: 80%;
+    min-height: 100px;
+    display: flex;
+    border-radius: 1em;
+    overflow: hidden;
+    background-color: white;
+}
+
+#main .inspector .itinerary .item .left {
+    width: 100px;
+    color: white;
+    background-color: #7EBD8B;
+    font-family: "Gloria Hallelujah", cursive;
+    font-weight: 800;
+    font-style: normal;
+    font-size: 16px;
+    line-height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#main .inspector .itinerary .item .right {
+    flex: 1;
+    padding: 15px;
+    font-family: "Gloria Hallelujah", cursive;
+    font-style: normal;
+    line-height: 20px;
+}
+
+#main .inspector .itinerary .item .right .title {
+    font-family: "Gloria Hallelujah", cursive;
+    color: #389a4c;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+#main .inspector .itinerary .item .right .location {
+    font-weight: 300;
+    font-size: 16px;
+    margin-top: 5px;
+    color: rgb(92, 92, 92);
+}
+
+#main .inspector .itinerary .item .right .info {
+    font-weight: 300;
+    font-size: 14px;
+    margin-top: 5px;
+    line-height: 13px;
+    color: gray;
+}
+
+#main .inspector .itinerary {
+
+}
+
+/*=== Calendar Area ===*/
 #main .right {
     flex: 1;
     height: 100%;
