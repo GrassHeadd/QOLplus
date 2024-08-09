@@ -31,7 +31,7 @@ function onNavToggleBtnClick(clickEvent) {
  * @param {Number} leftPanelMinWidthPerc The minimum width (in %) that the left panel can have
  * @param {Number} leftPanelMaxWidthPerc The maximum width (in %) that the left panel can have
  */
-function panelResizeListener(leftPanelMinWidthPerc = 20, leftPanelMaxWidthPerc = 80) {
+function panelResizeListener(leftPanelMinWidthPerc = 20, leftPanelMaxWidthPerc = 60) {
     const mainPanel = document.getElementById("main"), leftPanel = mainPanel.getElementsByClassName("inspector")[0], resizer = mainPanel.getElementsByClassName("resizer")[0];
 
     resizer.addEventListener("mousedown", (mouseEvent) => { isDraggingDivider = true; });
