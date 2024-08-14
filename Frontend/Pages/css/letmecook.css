@@ -373,10 +373,6 @@ body {
 }
 
 #main .calendar .dayDisplay .day {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 5px;
-    padding-right: 10px;
     color: #FFFFFF;
 }
 
@@ -392,4 +388,75 @@ body {
 
 #main .calendar .dayDisplay .day:is(:not(:nth-child(29), :nth-child(30), :nth-child(31), :nth-child(32), :nth-child(33), :nth-child(34), :nth-child(35))) {
     border-bottom: 1px solid rgb(105, 105, 105);
+}
+
+#main .calendar .bottom .dayDisplay .day {
+    position: relative;
+}
+
+#main .calendar .bottom .dayDisplay .day.selected {
+    background-color: rgb(214, 196, 196);
+}
+
+#main .calendar .bottom .dayDisplay .day.selected .dayMarker {
+    color: #5d5c5c
+}   
+
+#main .calendar .bottom .dayDisplay .day .dayMarker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 21px;
+    height: 21px;
+    position: absolute;
+    z-index: 3;
+    top: 3.85px;
+    right: 2px;
+}
+
+#main .calendar .bottom .dayDisplay .day .dayMarker.today {
+    border-radius: 50%;
+    background-color: rgb(255, 94, 0);
+    color: #FFFFFF;
+}
+
+#main .calendar .bottom .dayDisplay .day .events {
+    height: calc(100% - 30px);
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#main .calendar .bottom .dayDisplay .day .events .item {
+    width: 90%;
+    background-color: red;
+    display: flex;
+}
+
+#main .calendar .bottom .dayDisplay .day .events .item .marker {
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+}
+
+#main .calendar .bottom .dayDisplay .day .events .item .label {
+    margin: 0 5px;
+}
+
+#main .calendar .bottom .dayDisplay .day .events .item .amount {
+    color: rgb(219, 219, 219);
+    justify-self: flex-end;
+}
+
+#main .calendar .bottom .dayDisplay .day .events .item.gym .marker {
+    background-color: #7EBD8B;
+}
+
+#main .calendar .bottom .dayDisplay .day .events .item.gym .label {
+    color: #7EBD8B;
 }
