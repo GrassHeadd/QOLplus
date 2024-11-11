@@ -1,8 +1,8 @@
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
-document.addEventListener("DOMContentLoaded", (domLoadEvent) => {  
+document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
   loadInitialMonths(3);
   loadOtherMonths();
-  
+
   //indicateCurrentDay();
   //testEventRow();
 });
@@ -15,61 +15,31 @@ document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
 */
 
 function loadInitialMonths(plusMinusAmt) {
+  /* =================[ vv Variable Setup vv ]================= */
   // No arguments in Date constructor = today's date
-  const startMonthDate = new Date();
-  startMonthDate.setMonth(startMonthDate.getMonth() - plusMinusAmt);
-  startMonthDate.setDate(1);
+  // Using 0 as "day" automatically sets the date to the last day of the previous month, hence some currMonthIndex + 1
+  const currMonthDate = new Date(), currYear = currMonthDate.getFullYear(), currMonthIndex = currMonthDate.getMonth();
+  const currMonthStartDate = new Date(currYear, currMonthIndex, 1), startMonthDate = new Date(currYear, currMonthIndex - plusMinusAmt, 1), endMonthDate = new Date(currYear, currMonthIndex + plusMinusAmt + 1, 0);
 
-  // dowOfFdom = Day of week of the first day of this month
+  // dowOfFdom = Day of week of the first day of start month
   // Date.getDay() returns 0-6 Sunday to Monday, so this formula converts it to 1-7 Monday to Sunday for convenience
-  const dowOfFdom = (startMonthDate.getDay() + 7) % 8 + startMonthDate.getDay() / 8;
+  const dowOfFirstOfCurrMth = (currMonthStartDate.getDay() + 7) % 8 + Math.ceil(currMonthStartDate.getDay() / 8), dowOfFirstOfStartMth = (startMonthDate.getDay() + 7) % 8 + Math.ceil(startMonthDate.getDay() / 8);
 
-  // Finds the date of the last day of the current month
-  // Using 0 as arg automatically sets the date to the last day of the previous month, so I have to set it to the next month first.
-  startMonthDate.setMonth(startMonthDate.getMonth() + 1);
-  startMonthDate.setDate(0);
-  const daysInMonth = startMonthDate.getDate();
-
+  const endMonthDateStr = endMonthDate.toDateString();
   const dayDisplayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName("dayDisplay")[0];
 
-  const prevMonthDate = new Date(startMonthDate.getFullYear(), startMonthDate.getMonth(), 0);
-  // Rolls back the date of prevMonthDate to be suitable for iterating in the loop below
-  // E.g. 1 Nov 2024 is Friday (dowOfFdom = 5), prevMonth = 31 Oct 2024 is Thurs
-  // getDate() - dowFdom would yield 31 - 5 = 26, but we need to loop from 28 to 31 to
-  // fill in the empty calendar slots from Monday to Thursdays (Oct) before Fri (1 Nov)
-  prevMonthDate.setDate(prevMonthDate.getDate() - dowOfFdom + 2);
-  
-  // dom = Date of Month
-  // Handles creation of the previous month's date elements that fill up any extra space before the 1st day of the current month
-  for (var dom = 1; dom < dowOfFdom; dom++) {
-    var eventsHtml = "";
-    /*"<div class=\"events\">" +
-          "<div class=\"item gym\">" +
-          "<div class=\"marker\"></div>" +
-          "<div class=\"label\">" + labelText + "</div>" +
-          "<div class=\"amount\">" + timeText + "</div>" +
-      "</div>" +
-    "</div>";
-    */
-    dayDisplayElem.innerHTML += 
-    "<div class=\"day\">" +
-      "<div class=\"date dayMarker\">" + prevMonthDate.getDate() + "</div>"
-        + eventsHtml +
-    "</div>";
-    prevMonthDate.setDate(prevMonthDate.getDate() + 1);
+  /* =====================[ vv Main Logic vv ]===================== */
+
+  // This loop temporarily creates day items to fill up any extra space before the 1st day of the start month
+  // TODO: In dynamic loading, remove these when the other months load in the background (otherwise there'll be duplicates)
+  for (var i = dowOfFirstOfStartMth - 1; i > 0; i--) {
+    dayDisplayElem.innerHTML += "<div class=\"day\"><div>";
   }
-  
-  startMonthDate.setDate(1);
-  // Set endMonthDate to be the last day of the "max" month from plusMinusAmt
-  const endMonthDate = new Date();
-  endMonthDate.setMonth(endMonthDate.getMonth() + plusMinusAmt + 1);
-  endMonthDate.setDate(0);
-  const endMonthDateStr = endMonthDate.toDateString();
-  
-  const currDateStr = new Date().toDateString();
 
-  // Handles creation of all of min to max month's date elements
+  // Handles creation of all date elements between startMonthDate and endMonthDate
   while (true) {
+    if (startMonthDate.toDateString() == endMonthDateStr) break;
+
     var eventsHtml = "";
     /*"<div class=\"events\">" +
           "<div class=\"item gym\">" +
@@ -80,38 +50,23 @@ function loadInitialMonths(plusMinusAmt) {
     "</div>";
     */
 
-    dayDisplayElem.innerHTML += 
-    "<div class=\"day" + (startMonthDate.toDateString() == currDateStr ? " today" : "") + "\">" +
+    dayDisplayElem.innerHTML +=
+      "<div class=\"day " + startMonthDate.toDateString().replaceAll(" ", "") + "\">" +
       "<div class=\"date dayMarker\">" + startMonthDate.getDate() + "</div>"
-        + eventsHtml +
-    "</div>";
+      + eventsHtml +
+      "</div>";
 
     startMonthDate.setDate(startMonthDate.getDate() + 1);
   }
 
-  // Handles creation of the next month's date elements that fill up any extra space after the last day of the current month
-  for (var dom = 1; dom <= 35 - daysInMonth - dowOfFdom + 1; dom++) {
-    var eventsHtml = "";
-    /*"<div class=\"events\">" +
-          "<div class=\"item gym\">" +
-          "<div class=\"marker\"></div>" +
-          "<div class=\"label\">" + labelText + "</div>" +
-          "<div class=\"amount\">" + timeText + "</div>" +
-      "</div>" +
-    "</div>";
-    */
+  // Snap to the first day of the current month;
+  dayDisplayElem.getElementsByClassName(currMonthStartDate.toDateString().replaceAll(" ", ""))[0].scrollIntoView();
 
-    dayDisplayElem.innerHTML += 
-    "<div class=\"day\">" +
-      "<div class=\"date dayMarker\">" + dom + "</div>"
-        + eventsHtml +
-    "</div>";
+  // The default view can only show up to 5 rows, hence we check and move it down by 1 if the current date happens to past the 5th row
+  // E.g. 30 September 2024 is on the 6th row of the month
+  if (dowOfFirstOfCurrMth - 1 + currMonthDate.getDate() > 35) {
+    dayDisplayElem.getElementsByClassName(new Date(currYear, currMonthIndex, 8).toDateString().replaceAll(" ", ""))[0].scrollIntoView();
   }
-
-  // TODO: Find a better way to jump to current month. 
-  // Be aware of the edge case: if month starts on Sunday as 1st, month is > 29 days AND the current day is 30/31, then the current day's view will go past the 5th row
-  const currDateElem = dayDisplayElem.getElementsByClassName("today")[0];
-  currDateElem.scrollIntoView();
 }
 
 function loadOtherMonths() {
@@ -160,7 +115,7 @@ function testEventRow() {
     if (topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML.trim() == startDate) {
       startBoxDateNum = topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML.trim();
 
-      
+
 
       // topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML = "all women do is gaslight you and crush your will to live and sou leaving you as an empty shell just wandering in a materialistic worlds";
     }
