@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { createClient } from '@supabase/supabase-js';
+import cors from "cors";
 
 // Load environment variables
 dotenv.config();  
@@ -14,12 +15,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.get("/publicstaticvoidmain", async (req, res) => {
   try {
     // Example query - adjust table name and conditions as needed
     const { data, error } = await supabase
-    .from('users')
+    .from('events')
     .select('*');
 
     if (error) {
