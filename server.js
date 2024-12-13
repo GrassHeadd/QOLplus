@@ -6,10 +6,8 @@ import { createClient } from '@supabase/supabase-js';
 // Load environment variables
 dotenv.config();  
 const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseKey = process.env.DB_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-
 
 
 const app = express();
@@ -21,14 +19,9 @@ app.get("/publicstaticvoidmain", async (req, res) => {
   try {
     // Example query - adjust table name and conditions as needed
     const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('user_id', 2)
-      .limit(1)
-      // You can add filters like this:
-      // .eq('column_name', 'value')
-      // .gte('age', 18)
-      // .limit(10)
+    .from('users')
+    .select('*');
+
     if (error) {
       throw error;
     }
