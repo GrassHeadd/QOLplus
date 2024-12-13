@@ -3,12 +3,13 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { createClient } from '@supabase/supabase-js';
 
+// Load environment variables
+dotenv.config();  
 const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Load environment variables
-dotenv.config();  
+
 
 
 const app = express();
