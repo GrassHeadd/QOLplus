@@ -17,24 +17,31 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/publicstaticvoidmain", async (req, res) => {
+app.get("/events/:userId/:date", async (request, response) => {
   try {
     // Example query - adjust table name and conditions as needed
-    const { data, error } = await supabase
-    .from('events')
-    .select('*');
+    const userId = request.params.userId;
+    const date = new Date(request.params.date);
 
-    if (error) {
-      throw error;
-    }
-    console.log("output: ", data);
-    res.json({ data });
+    // Format of date: YYYYMM E.g. 202409, format of time: HHMM e.g. 0000 to 2359
+    const { data, error } = await supabase.from('events').select('*').eq("user_id", userId).gte("fromDate", "");
+    
+    if (error) {throw error;}
+
+    console.log("output: ", data + ", " + userId + "," + date);
+    response.json({ data });
   } catch (error) {
     console.error('Error:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
+    response.status(500).json({ error: 'Internal server error' });
   }
 });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+//TODO
+function formatDate(dateObj) {
+  // stump
+  return null;
+}
