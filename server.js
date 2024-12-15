@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import cors from "cors";
 
 // Load environment variables
-dotenv.config();  
+dotenv.config();
 const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -17,18 +17,14 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/events/:userId/:date", async (request, response) => {
+app.get("/events/:userId/:monthyear", async (request, response) => {
   try {
-    // Example query - adjust table name and conditions as needed
     const userId = request.params.userId;
-    const date = new Date(request.params.date);
+    const monthyear = request.params.monthyear; // Assumes that the provided date is properly formatted
 
-    // Format of date: YYYYMM E.g. 202409, format of time: HHMM e.g. 0000 to 2359
-    const { data, error } = await supabase.from('events').select('*').eq("user_id", userId).gte("fromDate", "");
-    
-    if (error) {throw error;}
+    const { data, error } = await supabase.from("events").select("*").eq("user_id", userId).lte("start_monthyear", monthyear).gte("end_monthyear", monthyear);
 
-    console.log("output: ", data + ", " + userId + "," + date);
+    if (error) { throw error; }
     response.json({ data });
   } catch (error) {
     console.error('Error:', error.message);
@@ -36,12 +32,51 @@ app.get("/events/:userId/:date", async (request, response) => {
   }
 });
 
+app.post("/events", async (request, response) => {
+  const { userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
+
+  if (category == null) category = "Others";
+  
+  try {
+  const { data, error } = await supabase.from("events").insert({
+    user_id: userId,
+    title: title,
+    location: location,
+    notes: notes,
+    category: category,
+    start_monthyear: startMonthYear,
+    end_monthyear: endMonthYear,
+    start_dayofmonth: startDOM,
+    end_dayofmonth: endDOM,
+    start_time: startTime,
+    end_time: endTime
+  });
+  
+  if (error) throw error;
+  
+  response.json({ data });
+} catch (error) {
+  console.error('Error:', error.message);
+  response.status(500).json({ error: 'Internal server error' });
+}
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-//TODO
+// Format: YYYYMMDD
 function formatDate(dateObj) {
-  // stump
-  return null;
+  var month = dateObj.getMonth() + 1, day = dateObj.getDate();
+  if (month < 10) month = "0" + month;
+  if (day < 10) day = "0" + day;
+  return dateObj.getFullYear() + "" + month + day;
+}
+
+// Format: HHMM in 24hr format
+function formatTime(dateObj) {
+  var hour = dateObj.getHours(), min = dateObj.getMinutes();
+  if (hour < 10) hour = "0" + hour;
+  if (min < 10) min = "0" + min;
+  return hour + "" + min;
 }
