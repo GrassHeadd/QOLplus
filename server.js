@@ -20,7 +20,7 @@ app.use(cors());
 app.get("/events/:userId/:monthyear", async (request, response) => {
   try {
     const userId = request.params.userId;
-    const monthyear = request.params.monthyear; // Assumes that the provided date is properly formatted
+    const monthyear = request.params.monthyear;
 
     const { data, error } = await supabase.from("events").select("*").eq("user_id", userId).lte("start_monthyear", monthyear).gte("end_monthyear", monthyear);
 
