@@ -131,10 +131,10 @@ async function loadEvents() {
 
     data.data.forEach(element => {
       const eventElement =
-        `<div class="item ${element.category}"> ` +
-        '  <div class="left"> ' +
+        `<div class="item ${element.category}">` +
+        '  <div class="left">' +
         `    <div class="period"> ${element.start_time}hr<br>-<br>${element.end_time}hr</div>` +
-        '  </div> ' +
+        '  </div>' +
         '  <div class="right">' +
         `    <div class="title"> ${element.title}</div>` +
         `    <div class="info">${element.notes}</div>` +
