@@ -32,8 +32,6 @@ app.get("/events/:userId/:monthyear", async (request, response) => {
   }
 });
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 app.post("/events", async (request, response) => {
   const { userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
 
@@ -62,27 +60,14 @@ app.post("/events", async (request, response) => {
   response.status(500).json({ error: 'Internal server error' });
 }
 });
-=======
-
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 // Format: YYYYMMDD
-=======
-=======
->>>>>>> Stashed changes
-
-
 //TODO
->>>>>>> Stashed changes
 function formatDate(dateObj) {
   var month = dateObj.getMonth() + 1, day = dateObj.getDate();
   if (month < 10) month = "0" + month;
