@@ -126,12 +126,7 @@ async function loadEvents() {
   try {
     const userId = 1;
     const monthyear = 202412;
-<<<<<<< Updated upstream
     const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
-=======
-    const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + "monthyear");
->>>>>>> Stashed changes
-
     const data = await response.json();
 
     data.data.forEach(element => {
