@@ -122,25 +122,27 @@ function testEventRow() {
   }
 }
 
-async function loadEvents(){
+async function loadEvents() {
   try {
-    const response = await fetch("https://qo-lplus.vercel.app/publicstaticvoidmain") 
+    const userId = 1;
+    const monthyear = 202412;
+    const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
 
     const data = await response.json();
 
     data.data.forEach(element => {
-    const eventElement = 
-    `                <div class="item ${element.category}"> ` + 
-                 ' <div class="left"> ' + 
-                 `<div class="period"> ${element.start_time}hr<br>-<br>${element.end_time}hr</div>` + 
-                '  </div> ' + 
-                 '<div class="right">' +
-                  `<div class="title"> ${element.title}</div>`    +
-                   `   <div class="info">${element.notes}</div>`+
-                  '                    </div>'+
-                  '                </div>'
+      const eventElement =
+        `<div class="item ${element.category}"> ` +
+        '  <div class="left"> ' +
+        `    <div class="period"> ${element.start_time}hr<br>-<br>${element.end_time}hr</div>` +
+        '  </div> ' +
+        '  <div class="right">' +
+        `    <div class="title"> ${element.title}</div>` +
+        `    <div class="info">${element.notes}</div>` +
+        '  </div>' +
+        '</div>'
 
-    document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].innerHTML+=eventElement;
+      document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].innerHTML += eventElement;
     });
 
     console.log("Events data:", data.data);
