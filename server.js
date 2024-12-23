@@ -33,6 +33,7 @@ app.get("/events/:userId/:monthyear", async (request, response) => {
 });
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 app.post("/events", async (request, response) => {
   const { userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
 
@@ -64,14 +65,20 @@ app.post("/events", async (request, response) => {
 =======
 
 >>>>>>> Stashed changes
+=======
+
+>>>>>>> Stashed changes
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // Format: YYYYMMDD
 =======
+=======
+>>>>>>> Stashed changes
 
 
 //TODO
