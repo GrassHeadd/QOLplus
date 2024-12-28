@@ -1,8 +1,8 @@
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
-  loadInitialMonths(3);
+  // loadInitialMonths(3);
   loadOtherMonths();
-  loadEvents();
+  // loadEvents();
   //indicateCurrentDay();
   //testEventRow();
 });

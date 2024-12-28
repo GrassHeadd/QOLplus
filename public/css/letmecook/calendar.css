@@ -67,27 +67,58 @@
 
 
 /* Event Marker */
-#main .calendar .dayDisplay .day .event {
+#main .calendar .dayDisplay .day .eventContainer {
     position: absolute;
-    width: calc(100% - 4px);
-    background-color: rgba(255, 255, 0, 0.54);
+    width: 100%;
+    height: calc(100% - 30px);
+    margin-top: 30px;
+    overflow: hidden;
+}
+
+#main .calendar .dayDisplay .day .eventRibbon {
+    width: calc(100% - 20px);
     color: white;
-    padding: 5px 0;
-    margin: 2px;
+    margin: 0 5px;
+    margin-top: 5px;
+    padding: 5px;
+    display: flex;
+    font-size: 15px;
+    background-color: rgba(205, 205, 205, 0.1);
+    justify-content: space-between;
+    border-radius: 5px;
 }
 
-#main .calendar .dayDisplay .day .event .title {
+#main .calendar .dayDisplay .day .eventRibbon .indicator {
+    min-width: 7px;
+    min-height: 7px;
+    width: 0.5vw;
+    height: 0.5vw;
+    border-radius: 50%;
+    background-color: rgb(255, 94, 0);
+    margin: 4px 5px 0 0;
+}
+
+#main .calendar .dayDisplay .day .eventRibbon:nth-child(1) .indicator {
+    background-color: rgb(255, 94, 0);
+}
+
+#main .calendar .dayDisplay .day .eventRibbon:nth-child(2) .indicator {
+    background-color: rgb(72, 255, 0);
+}
+
+#main .calendar .dayDisplay .day .eventRibbon:nth-child(3) .indicator {
+    background-color: rgb(0, 229, 255);
+}
+
+#main .calendar .dayDisplay .day .eventRibbon .title {
     flex: 1;
-    margin: auto 0;
+    overflow-x: hidden;
+    white-space: nowrap;
 }
 
-#main .calendar .dayDisplay .day .event .time {
-    width: auto;
-    padding: 0 7px;
-}
-
-#main .calendar .dayDisplay .day .event .time {
-
+#main .calendar .dayDisplay .day .eventRibbon .time {
+    color: rgb(168, 168, 168);
+    margin-left: 3px;
 }
 
 
