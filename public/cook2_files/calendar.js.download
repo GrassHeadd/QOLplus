@@ -141,33 +141,20 @@ async function loadEvents() {
         `    <div class="title"> ${title}</div>` +
         `    <div class="info">${notes}</div>` +
         '  </div>' +
-        '</div>';
+        '</div>'
 
       document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].innerHTML += eventElement;
 
-      for (var day = startDOM; day <= endDOM; day++) {
-        const eventMarkerElem =
-          `<div class="event">` +
-          `  <div class="title">${title}</div>` +
-          `  <div class="time">${formatTime(startTime)} - ${formatTime(endTime)}` +
-          '  </div>' +
-          '</div>';
-
-          document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].innerHTML += eventElement;
+      if (startTime) {
+        console.log("yes");
       }
     });
 
     console.log("Events data:", data.data);
+
+
+
   } catch (error) {
     console.error('Error:', error.message);
   }
-}
-
-function formatTime(timeInt) {
-  var string = "";
-  if (timeInt % 10 < 10) {
-    string += "0";
-  }
-  string += timeInt;
-  return string + "hr";
 }
