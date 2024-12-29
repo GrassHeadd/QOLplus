@@ -1,9 +1,9 @@
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
-  // loadInitialMonths(3);
+  loadInitialMonths(3);
   loadOtherMonths();
-  // loadEvents();
-  //indicateCurrentDay();
+  loadEvents();
+  indicateCurrentDay();
   //testEventRow();
 });
 
@@ -74,52 +74,24 @@ function loadOtherMonths() {
 }
 
 function indicateCurrentDay() {
-  // Grab current day and then the date as number
-  const currDate = new Date(); //get date
-  var currDateNum = currDate.getDate(); //get day
+  // // Grab current day and then the date as number
+  // const currDate = new Date(); //get date
+  // var currDateNum = currDate.getDate(); //get day
 
-  // Grab all 35 day HTML elements
-  const allDayElements = document
-    .getElementsByClassName("dayDisplay")[0]
-    .getElementsByClassName("day");
+  // // Grab all 35 day HTML elements
+  // const allDayElements = document
+  //   .getElementsByClassName("dayDisplay")[0]
+  //   .getElementsByClassName("day");
 
-  // Loop through the 35 HTMl elements
-  for (var i = 0; i < allDayElements.length; i++) {
-    const dayElement = allDayElements[i];
+  // // Loop through the 35 HTMl elements
+  // for (var i = 0; i < allDayElements.length; i++) {
+  //   const dayElement = allDayElements[i];
 
-    // Find which one has a date number that matches the current day, then add the "today" class to it so the CSS kicks into effect
-    if (dayElement.getElementsByClassName("date")[0].innerHTML == currDateNum) {
-      dayElement.getElementsByClassName("date")[0].classList.add("today");
-    } //add the class for css to the day that is today
-  }
-}
-
-function testEventRow() {
-  const startDate = 1212, endDate = 16, dayCount = endDate - startDate;
-
-  // All calculations must minus the topleft day (item 0)
-  const topLeftBoxNum = document
-    .getElementsByClassName("dayDisplay")[0]
-    .getElementsByClassName("day");
-
-  var startBoxDateNum;
-  // Find the index & actual date of start Box
-  for (var i = 0; i < topLeftBoxNum.length; i++) {
-    if (topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML.trim() == startDate) {
-      startBoxDateNum = topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML.trim();
-      // topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML = "all women do is gaslight you and crush your will to live and sou leaving you as an empty shell just wandering in a materialistic worlds";
-    }
-  }
-
-  for (var i = 0; i < topLeftBoxNum.length; i++) {
-    if (topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML.trim() == startDate) {
-      startBoxDateNum = topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML.trim();
-
-
-
-      // topLeftBoxNum[i].getElementsByClassName("date")[0].innerHTML = "all women do is gaslight you and crush your will to live and sou leaving you as an empty shell just wandering in a materialistic worlds";
-    }
-  }
+  //   // Find which one has a date number that matches the current day, then add the "today" class to it so the CSS kicks into effect
+  //   if (dayElement.getElementsByClassName("date")[0].innerHTML == currDateNum) {
+  //     dayElement.getElementsByClassName("date")[0].classList.add("today");
+  //   } //add the class for css to the day that is today
+  // }
 }
 
 async function loadEvents() {
@@ -145,16 +117,17 @@ async function loadEvents() {
 
       document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].innerHTML += eventElement;
 
-      for (var day = startDOM; day <= endDOM; day++) {
-        const eventMarkerElem =
-          `<div class="event">` +
-          `  <div class="title">${title}</div>` +
-          `  <div class="time">${formatTime(startTime)} - ${formatTime(endTime)}` +
-          '  </div>' +
-          '</div>';
+      const eventMarkerElem =
+        `<div class="eventRibbon long">` +
+        `   <div class="indicator"></div>` +
+        `   <div class="title">${title}</div>` +
+        `   <div class="time">${startTime}</div>` +
+        `</div>`;
 
-          document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].innerHTML += eventElement;
-      }
+      var thisDate = new Date(parseInt((startMY + "").slice(0, 4)), parseInt((startMY + "").slice(4, 6)) - 1, startDOM), nextSundayDelta = getNextSundayDelta(thisDate), nextSunday = new Date(thisDate);
+      nextSunday.setDate(nextSunday.getDate() + nextSundayDelta);
+      // TODO: Check if end date stretches past nearest sunday, then generate ribbon to sunday and another from monday onwards if so; otherwise, just generate with the margin based on num of days between start and end day
+      document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(thisDate.toDateString().replaceAll(" ", ""))[0].innerHTML += eventMarkerElem;
     });
 
     console.log("Events data:", data.data);
@@ -170,4 +143,13 @@ function formatTime(timeInt) {
   }
   string += timeInt;
   return string + "hr";
+}
+
+function getNextSundayDelta(curDate) {
+  var counter = 0;
+  do {
+    curDate.setDate(curDate.getDate() + 1);
+    counter++;
+  } while (curDate.getDay() != 6);
+  return counter;
 }

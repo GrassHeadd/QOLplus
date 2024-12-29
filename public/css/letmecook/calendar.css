@@ -67,12 +67,13 @@
 
 
 /* Event Marker */
-#main .calendar .dayDisplay .day .eventContainer {
+/* #main .calendar .dayDisplay .day .eventContainer {
+    z-index: 10;
     position: absolute;
     width: 100%;
     height: calc(100% - 30px);
     margin-top: 30px;
-    overflow: hidden;
+    overflow-y: hidden;
 }
 
 #main .calendar .dayDisplay .day .eventRibbon {
@@ -86,6 +87,33 @@
     background-color: rgba(205, 205, 205, 0.1);
     justify-content: space-between;
     border-radius: 5px;
+}*/
+
+#main .calendar .dayDisplay .day .eventRibbon:nth-child(2) {
+    margin-top: 27px;
+}
+
+#main .calendar .dayDisplay .day .eventRibbon {
+    width: calc(100% - 20px);
+    color: white;
+    margin: 0 5px;
+    margin-top: 5px;
+    padding: 5px;
+    display: flex;
+    font-size: 15px;
+    background-color: rgba(205, 205, 205, 0.1);
+    justify-content: space-between;
+    border-radius: 5px;
+}
+
+#main .calendar .dayDisplay .day .eventRibbon.long {
+    width: calc(200% - 20px);
+}
+
+#main .calendar .dayDisplay .day .eventRibbon.week {
+}
+
+#main .calendar .dayDisplay .day .eventRibbon.week2 {
 }
 
 #main .calendar .dayDisplay .day .eventRibbon .indicator {
