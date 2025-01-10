@@ -10,3 +10,6 @@ QOLplus is a personal assistant application designed to centralize all your esse
 - **Financial Tracker**: Manage your expenses and budget effectively.
 - **Gym Tracker**: Track your workouts and fitness progress.
 - **AI Integration**: Coming soon! AI features to make the app easier to use.
+
+## Deployment
+deployed at: https://qo-lplus.vercel.app/letmecook.html
