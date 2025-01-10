@@ -35,14 +35,6 @@ QOLplus is a personal assistant application designed to centralize all your esse
   ```
 2. Open your browser and go to `http://localhost:3000`.
 
-## Contributing
-
-Contributions are welcome! Please fork the repository and create a pull request with your changes.
-
-## License
-
-This project is licensed under the MIT License.
-
 ## Contact
 
-For any questions or suggestions, please contact [your email].
+For any questions or suggestions, please contact e1122283@u.nus.edu
