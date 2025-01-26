@@ -101,6 +101,8 @@ async function loadEvents() {
     const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
     const data = await response.json();
 
+    console.log("Events:", data.data);
+
     data.data.forEach(element => {
       const title = element.title, category = element.category, startDOM = element.start_dayofmonth, endDOM = element.end_dayofmonth, startTime = element.start_time, endTime = element.end_time, startMY = element.start_monthyear, endMY = element.end_monthyear, location = element.location, notes = element.notes;
 
@@ -117,20 +119,66 @@ async function loadEvents() {
 
       document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].innerHTML += eventElement;
 
-      const eventMarkerElem =
-        `<div class="eventRibbon long">` +
+
+
+
+      const eventMarkerElemStr =
+        `<div class="eventRibbon">` +
         `   <div class="indicator"></div>` +
         `   <div class="title">${title}</div>` +
         `   <div class="time">${startTime}</div>` +
         `</div>`;
 
-      var thisDate = new Date(parseInt((startMY + "").slice(0, 4)), parseInt((startMY + "").slice(4, 6)) - 1, startDOM), nextSundayDelta = getNextSundayDelta(thisDate), nextSunday = new Date(thisDate);
-      nextSunday.setDate(nextSunday.getDate() + nextSundayDelta);
-      // TODO: Check if end date stretches past nearest sunday, then generate ribbon to sunday and another from monday onwards if so; otherwise, just generate with the margin based on num of days between start and end day
-      document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(thisDate.toDateString().replaceAll(" ", ""))[0].innerHTML += eventMarkerElem;
-    });
+      var startDate = getDateFromFormatted(startDOM, startMY), endDate = getDateFromFormatted(endDOM, endMY);
+      var dayCount = getDayNumBetween(startDate, endDate);
 
-    console.log("Events data:", data.data);
+      const dayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(startDate.toDateString().replaceAll(" ", ""))[0];
+      var curDate = new Date(startDate.getTime());
+      var nextSundayDelta = getNextSundayDelta(curDate);
+
+      // Generate the event marker HTML for the current week row
+      const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
+      dayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
+      const allDayEvents = dayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
+      eventMarkerElem.style.width = "calc(" + (100 * firstRowLength) + "% - 28px)";
+      dayCount -= firstRowLength;
+      if (dayCount > 0) {
+        eventMarkerElem.style.width = "calc(" + (100 * firstRowLength) + "% - 18px)";
+        eventMarkerElem.style.marginRight = 0;
+        eventMarkerElem.style.borderTopRightRadius = 0;
+        eventMarkerElem.style.borderBottomRightRadius = 0;
+      }
+
+      console.log("Left " + dayCount + " days to mark out after first row");
+
+      // If there are any days left after the first row's event marker, continue making it
+      var fullRowCounter = 0;
+      while (dayCount > 0) {
+        var curRowLength = Math.min(7, dayCount);
+        var mondayDate = new Date(startDate.getTime());
+        mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
+        var mondayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(mondayDate.toDateString().replaceAll(" ", ""))[0];
+        mondayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
+        const allDayEvents = mondayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
+
+        dayCount -= curRowLength;
+        fullRowCounter++;
+
+        // By default no margins on left since it's continue from the event marker in the previous row
+        eventMarkerElem.style.marginLeft = 0;
+        eventMarkerElem.style.borderTopLeftRadius = 0;
+        eventMarkerElem.style.borderBottomLeftRadius = 0;
+        
+        // Check if there should be right margin (i.e. whether there is a next row to generate or not)
+        // Ternary Operator Reasoning: dayCount == 0 means event ends on the sunday (i.e. no more rows to generate), so no right margins taken into account when calculating width
+        eventMarkerElem.style.width = "calc(" + (100 * curRowLength) + "% - " + (dayCount == 0 ? 18 : 6) + "px)";
+        if (dayCount > 0) {
+          eventMarkerElem.style.marginRight = 0;
+          eventMarkerElem.style.borderTopRightRadius = 0;
+          eventMarkerElem.style.borderBottomRightRadius = 0;
+        }
+      }
+    });
   } catch (error) {
     console.error('Error:', error.message);
   }
@@ -145,11 +193,14 @@ function formatTime(timeInt) {
   return string + "hr";
 }
 
-function getNextSundayDelta(curDate) {
-  var counter = 0;
-  do {
-    curDate.setDate(curDate.getDate() + 1);
-    counter++;
-  } while (curDate.getDay() != 6);
-  return counter;
+function getNextSundayDelta(date) {
+  return 7 - (date.getDay() == 0 ? 7 : date.getDay());
+}
+
+function getDateFromFormatted(dom, my) {
+  return new Date(parseInt((my + "").slice(0, 4)), parseInt((my + "").slice(4, 6)) - 1, dom);
+}
+
+function getDayNumBetween(startDate, endDate) {
+  return Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
 }
