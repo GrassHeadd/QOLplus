@@ -87,7 +87,13 @@
     margin-top: 27px;
 }
 
-#main .calendar .dayDisplay .day .eventRibbon:hover {
+
+/* Replaced with Javascript class adding */
+/* #main .calendar .dayDisplay .day .eventRibbon:hover {
+    background-color: rgba(126, 126, 126, 0.64);
+} */
+
+#main .calendar .dayDisplay .day .eventRibbon.active {
     background-color: rgba(126, 126, 126, 0.64);
 }
 

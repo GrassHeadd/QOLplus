@@ -103,8 +103,18 @@ async function loadEvents() {
 
     console.log("Events:", data.data);
 
-    data.data.forEach(element => {
-      const title = element.title, category = element.category, startDOM = element.start_dayofmonth, endDOM = element.end_dayofmonth, startTime = element.start_time, endTime = element.end_time, startMY = element.start_monthyear, endMY = element.end_monthyear, location = element.location, notes = element.notes;
+    const events = data.data, eventColours = [];
+
+    var eventItinElems = [], eventRowElems = [];
+
+    events.forEach(event => {
+      const title = event.title, category = event.category, startDOM = event.start_dayofmonth, endDOM = event.end_dayofmonth, startTime = event.start_time, endTime = event.end_time, startMY = event.start_monthyear, endMY = event.end_monthyear, location = event.location, notes = event.notes;
+
+      var rowElems = [];
+
+      // Generate a random colour for each event
+      const colourStr = getRandomcolourStr(eventColours);
+      eventColours.push(colourStr);
 
       const eventElement =
         `<div class="item ${category}">` +
@@ -117,10 +127,9 @@ async function loadEvents() {
         '  </div>' +
         '</div>';
 
-      document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].innerHTML += eventElement;
-
-
-
+      document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].insertAdjacentHTML("beforeend", eventElement);
+      const allItinElems = document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].getElementsByClassName("item"), eventItenElem = allItinElems[allItinElems.length - 1];
+      eventItenElem.getElementsByClassName("left")[0].style.backgroundColor = colourStr;
 
       const eventMarkerElemStr =
         `<div class="eventRibbon">` +
@@ -132,15 +141,18 @@ async function loadEvents() {
       var startDate = getDateFromFormatted(startDOM, startMY), endDate = getDateFromFormatted(endDOM, endMY);
       var dayCount = getDayNumBetween(startDate, endDate);
 
-      const dayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(startDate.toDateString().replaceAll(" ", ""))[0];
+      const parentDayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(startDate.toDateString().replaceAll(" ", ""))[0];
       var curDate = new Date(startDate.getTime());
       var nextSundayDelta = getNextSundayDelta(curDate);
 
+
       // Generate the event marker HTML for the current week row
       const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
-      dayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
-      const allDayEvents = dayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
+      parentDayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
+      const allDayEvents = parentDayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
       eventMarkerElem.style.width = "calc(" + (100 * firstRowLength) + "% - 28px)";
+      eventMarkerElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
+      rowElems.push(eventMarkerElem);
       dayCount -= firstRowLength;
       if (dayCount > 0) {
         eventMarkerElem.style.width = "calc(" + (100 * firstRowLength) + "% - 18px)";
@@ -148,8 +160,6 @@ async function loadEvents() {
         eventMarkerElem.style.borderTopRightRadius = 0;
         eventMarkerElem.style.borderBottomRightRadius = 0;
       }
-
-      console.log("Left " + dayCount + " days to mark out after first row");
 
       // If there are any days left after the first row's event marker, continue making it
       var fullRowCounter = 0;
@@ -160,6 +170,8 @@ async function loadEvents() {
         var mondayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(mondayDate.toDateString().replaceAll(" ", ""))[0];
         mondayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
         const allDayEvents = mondayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
+        eventMarkerElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
+        rowElems.push(eventMarkerElem);
 
         dayCount -= curRowLength;
         fullRowCounter++;
@@ -168,7 +180,7 @@ async function loadEvents() {
         eventMarkerElem.style.marginLeft = 0;
         eventMarkerElem.style.borderTopLeftRadius = 0;
         eventMarkerElem.style.borderBottomLeftRadius = 0;
-        
+
         // Check if there should be right margin (i.e. whether there is a next row to generate or not)
         // Ternary Operator Reasoning: dayCount == 0 means event ends on the sunday (i.e. no more rows to generate), so no right margins taken into account when calculating width
         eventMarkerElem.style.width = "calc(" + (100 * curRowLength) + "% - " + (dayCount == 0 ? 18 : 6) + "px)";
@@ -178,10 +190,65 @@ async function loadEvents() {
           eventMarkerElem.style.borderBottomRightRadius = 0;
         }
       }
+
+      eventItinElems.push(eventItenElem);
+      eventRowElems.push(rowElems);
     });
+
+    // Hover-active state linking between itninerary cards and calendar ribbons
+    eventItinElems.forEach((itinElem, index) => {
+
+      itinElem.addEventListener("mouseenter", event => {
+        eventRowElems[index].forEach(rowElem => {
+          if (!rowElem.classList.contains("active")) rowElem.classList.add("active");
+        });
+      });
+  
+      itinElem.addEventListener("mouseleave", event => {
+        eventRowElems[index].forEach(rowElem => {
+          if (rowElem.classList.contains("active")) rowElem.classList.remove("active");
+        });
+      });
+    });
+
+    // Each Row Item actives all others when hovered over
+    eventRowElems.forEach(rowGroup => {
+      rowGroup.forEach(rowItem => {
+        rowItem.addEventListener("mouseenter", event => {
+          rowGroup.forEach(eachRowItem => {
+            if (!eachRowItem.classList.contains("active")) eachRowItem.classList.add("active");
+          });
+        });
+
+        rowItem.addEventListener("mouseleave", event => {
+          rowGroup.forEach(eachRowItem => {
+            if (eachRowItem.classList.contains("active")) eachRowItem.classList.remove("active");
+          });
+        });
+      });
+    });
+
   } catch (error) {
     console.error('Error:', error.message);
   }
+}
+
+// TODO: Improve colour similarity checker (e.g. shades of green that are too close won't be accepted)
+function getRandomcolourStr(colourStrs) {
+  var r = Math.round(Math.random() * 255), g = Math.round(Math.random() * 255), b = Math.round(Math.random() * 255);
+  var colourStr = "rgb(" + r + ", " + g + ", " + b + ")";
+
+  var similarFound = false;
+  for (var i = 0; i < colourStrs.length; i++) {
+    var otherStrParts = colourStrs[i].replaceAll("rgb(", "").replaceAll(")", "").replaceAll(" ", "").split(",");
+    var otherR = parseInt(otherStrParts[0]), otherG = parseInt(otherStrParts[1]), otherB = parseInt(otherStrParts[2]);
+    if (Math.abs(r - otherR) <= 10 && Math.abs(g - otherG) <= 10 && Math.abs(b - otherB) <= 10) {
+      similarFound = true;
+      break;
+    }
+  }
+
+  return similarFound ? getRandomcolourStr(colourStrs) : colourStr;
 }
 
 function formatTime(timeInt) {
