@@ -104,18 +104,22 @@ async function loadEvents() {
     console.log("Events:", data.data);
 
     const events = data.data, eventColours = [];
-
     var eventItinElems = [], eventRowElems = [];
+
+    /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
+    events.sort((event1, event2) => getDateFromFormatted(event1.start_dayofmonth, event1.start_monthyear).getTime() - getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
 
     events.forEach(event => {
       const title = event.title, category = event.category, startDOM = event.start_dayofmonth, endDOM = event.end_dayofmonth, startTime = event.start_time, endTime = event.end_time, startMY = event.start_monthyear, endMY = event.end_monthyear, location = event.location, notes = event.notes;
 
       var rowElems = [];
 
-      // Generate a random colour for each event
+      /* 2 Generate a random colour for each event */
       const colourStr = getRandomcolourStr(eventColours);
       eventColours.push(colourStr);
 
+
+      /* 3. Generate Itinerary item */
       const eventElement =
         `<div class="item ${category}">` +
         '  <div class="left">' +
@@ -131,13 +135,6 @@ async function loadEvents() {
       const allItinElems = document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].getElementsByClassName("item"), eventItenElem = allItinElems[allItinElems.length - 1];
       eventItenElem.getElementsByClassName("left")[0].style.backgroundColor = colourStr;
 
-      const eventMarkerElemStr =
-        `<div class="eventRibbon">` +
-        `   <div class="indicator"></div>` +
-        `   <div class="title">${title}</div>` +
-        `   <div class="time">${startTime}</div>` +
-        `</div>`;
-
       var startDate = getDateFromFormatted(startDOM, startMY), endDate = getDateFromFormatted(endDOM, endMY);
       var dayCount = getDayNumBetween(startDate, endDate);
 
@@ -146,49 +143,23 @@ async function loadEvents() {
       var nextSundayDelta = getNextSundayDelta(curDate);
 
 
-      // Generate the event marker HTML for the current week row
+      /* 4. Generate the first row's ribbon  */
       const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
-      parentDayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
-      const allDayEvents = parentDayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
-      eventMarkerElem.style.width = "calc(" + (100 * firstRowLength) + "% - 28px)";
-      eventMarkerElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
-      rowElems.push(eventMarkerElem);
       dayCount -= firstRowLength;
-      if (dayCount > 0) {
-        eventMarkerElem.style.width = "calc(" + (100 * firstRowLength) + "% - 18px)";
-        eventMarkerElem.style.marginRight = 0;
-        eventMarkerElem.style.borderTopRightRadius = 0;
-        eventMarkerElem.style.borderBottomRightRadius = 0;
-      }
+      const firstRowElem = spawnEventRibbon(parentDayElem, event, firstRowLength, true, dayCount > 0);
+      rowElems.push(firstRowElem);
 
-      // If there are any days left after the first row's event marker, continue making it
+      /* 5. Generate all subsequent row's ribbons */
       var fullRowCounter = 0;
       while (dayCount > 0) {
         var curRowLength = Math.min(7, dayCount);
         var mondayDate = new Date(startDate.getTime());
         mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
-        var mondayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(mondayDate.toDateString().replaceAll(" ", ""))[0];
-        mondayElem.insertAdjacentHTML('beforeend', eventMarkerElemStr);
-        const allDayEvents = mondayElem.getElementsByClassName("eventRibbon"), eventMarkerElem = allDayEvents[allDayEvents.length - 1];
-        eventMarkerElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
-        rowElems.push(eventMarkerElem);
-
+        const mondayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(mondayDate.toDateString().replaceAll(" ", ""))[0];
         dayCount -= curRowLength;
+        const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colourStr, false, dayCount > 0)
+        rowElems.push(curRowRibbon);
         fullRowCounter++;
-
-        // By default no margins on left since it's continue from the event marker in the previous row
-        eventMarkerElem.style.marginLeft = 0;
-        eventMarkerElem.style.borderTopLeftRadius = 0;
-        eventMarkerElem.style.borderBottomLeftRadius = 0;
-
-        // Check if there should be right margin (i.e. whether there is a next row to generate or not)
-        // Ternary Operator Reasoning: dayCount == 0 means event ends on the sunday (i.e. no more rows to generate), so no right margins taken into account when calculating width
-        eventMarkerElem.style.width = "calc(" + (100 * curRowLength) + "% - " + (dayCount == 0 ? 18 : 6) + "px)";
-        if (dayCount > 0) {
-          eventMarkerElem.style.marginRight = 0;
-          eventMarkerElem.style.borderTopRightRadius = 0;
-          eventMarkerElem.style.borderBottomRightRadius = 0;
-        }
       }
 
       eventItinElems.push(eventItenElem);
@@ -203,7 +174,7 @@ async function loadEvents() {
           if (!rowElem.classList.contains("active")) rowElem.classList.add("active");
         });
       });
-  
+
       itinElem.addEventListener("mouseleave", event => {
         eventRowElems[index].forEach(rowElem => {
           if (rowElem.classList.contains("active")) rowElem.classList.remove("active");
@@ -231,6 +202,37 @@ async function loadEvents() {
   } catch (error) {
     console.error('Error:', error.message);
   }
+}
+
+function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasRightMargin) {
+  const title = event.title, startTime = event.start_time;
+
+  const eventRibbonElemStr =
+    `<div class="eventRibbon">` +
+    `   <div class="indicator"></div>` +
+    `   <div class="title">${title}</div>` +
+    `   <div class="time">${startTime}</div>` +
+    `</div>`;
+
+  dayElem.insertAdjacentHTML('beforeend', eventRibbonElemStr);
+  const allDayEvents = dayElem.getElementsByClassName("eventRibbon"), eventRibbonElem = allDayEvents[allDayEvents.length - 1];
+
+  if (!hasLeftMargin) {
+    eventRibbonElem.style.marginLeft = 0;
+    eventRibbonElem.style.borderTopLeftRadius = 0;
+    eventRibbonElem.style.borderBottomLeftRadius = 0;
+  }
+
+  if (!hasRightMargin) {
+    eventRibbonElem.style.marginRight = 0;
+    eventRibbonElem.style.borderTopRightRadius = 0;
+    eventRibbonElem.style.borderBottomRightRadius = 0;
+  }
+
+  eventRibbonElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
+  eventRibbonElem.style.width = "calc(" + (100 * length) + "% - " + (!hasLeftMargin ? (!hasRightMargin ? 6 : 18) : (!hasRightMargin ? 18 : 28)) + "px)";
+
+  return eventRibbonElem;
 }
 
 // TODO: Improve colour similarity checker (e.g. shades of green that are too close won't be accepted)
