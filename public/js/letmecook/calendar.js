@@ -94,6 +94,7 @@ function indicateCurrentDay() {
   // }
 }
 
+// Handles event fetching from backend & frontend displaying of events
 async function loadEvents() {
   try {
     const userId = 1;
@@ -115,9 +116,8 @@ async function loadEvents() {
       var rowElems = [];
 
       /* 2 Generate a random colour for each event */
-      const colourStr = getRandomcolourStr(eventColours);
+      const colourStr = getRandomColourStr(eventColours);
       eventColours.push(colourStr);
-
 
       /* 3. Generate Itinerary item */
       const eventElement =
@@ -142,11 +142,10 @@ async function loadEvents() {
       var curDate = new Date(startDate.getTime());
       var nextSundayDelta = getNextSundayDelta(curDate);
 
-
       /* 4. Generate the first row's ribbon  */
       const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
       dayCount -= firstRowLength;
-      const firstRowElem = spawnEventRibbon(parentDayElem, event, firstRowLength, true, dayCount > 0);
+      const firstRowElem = spawnEventRibbon(parentDayElem, event, firstRowLength, colourStr, true, dayCount == 0);
       rowElems.push(firstRowElem);
 
       /* 5. Generate all subsequent row's ribbons */
@@ -157,7 +156,7 @@ async function loadEvents() {
         mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
         const mondayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(mondayDate.toDateString().replaceAll(" ", ""))[0];
         dayCount -= curRowLength;
-        const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colourStr, false, dayCount > 0)
+        const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colourStr, false, dayCount == 0);
         rowElems.push(curRowRibbon);
         fullRowCounter++;
       }
@@ -204,8 +203,11 @@ async function loadEvents() {
   }
 }
 
+// Creates an Event Ribbon at the given HTML Element of the specific day
 function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasRightMargin) {
   const title = event.title, startTime = event.start_time;
+
+  if (title == "Plan Bali Trip") console.log(hasRightMargin + " test");
 
   const eventRibbonElemStr =
     `<div class="eventRibbon">` +
@@ -230,13 +232,13 @@ function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasR
   }
 
   eventRibbonElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
-  eventRibbonElem.style.width = "calc(" + (100 * length) + "% - " + (!hasLeftMargin ? (!hasRightMargin ? 6 : 18) : (!hasRightMargin ? 18 : 28)) + "px)";
+  eventRibbonElem.style.width = "calc(" + (100 * length) + "% - " + (hasLeftMargin ? (hasRightMargin ? 28 : 18) : (hasRightMargin ? 18 : 8)) + "px)";
 
   return eventRibbonElem;
 }
 
 // TODO: Improve colour similarity checker (e.g. shades of green that are too close won't be accepted)
-function getRandomcolourStr(colourStrs) {
+function getRandomColourStr(colourStrs) {
   var r = Math.round(Math.random() * 255), g = Math.round(Math.random() * 255), b = Math.round(Math.random() * 255);
   var colourStr = "rgb(" + r + ", " + g + ", " + b + ")";
 
@@ -250,9 +252,10 @@ function getRandomcolourStr(colourStrs) {
     }
   }
 
-  return similarFound ? getRandomcolourStr(colourStrs) : colourStr;
+  return similarFound ? getRandomColourStr(colourStrs) : colourStr;
 }
 
+// Formats time in a HHMMhrs format (since it deletes trailing 0s)
 function formatTime(timeInt) {
   var string = "";
   if (timeInt % 10 < 10) {
@@ -262,14 +265,17 @@ function formatTime(timeInt) {
   return string + "hr";
 }
 
+// Get number of days until the next sunday in the week
 function getNextSundayDelta(date) {
   return 7 - (date.getDay() == 0 ? 7 : date.getDay());
 }
 
+// Get Date Object given DOM and MY
 function getDateFromFormatted(dom, my) {
   return new Date(parseInt((my + "").slice(0, 4)), parseInt((my + "").slice(4, 6)) - 1, dom);
 }
 
+// Get number of days between start date and end date + 1 (so if it's the same day it'll be 1)
 function getDayNumBetween(startDate, endDate) {
   return Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
 }
