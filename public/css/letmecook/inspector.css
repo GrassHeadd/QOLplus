@@ -8,16 +8,134 @@
   align-items: stretch;
 }
 
-#main .inspector .qotd {
-  color: white;
-  background-color: #1e1f22;
+#main .inspector .topLeftArea {
+  width: 100%;
   height: 250px;
+  color: white;
+}
+
+/* Event Popup Area */
+#main .inspector .topLeftArea .addEventPopup {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#main .inspector .topLeftArea .addEventPopup .topArea {
+  width: 100%;
   display: flex;
+  font-size: 1.35vw;
+  font-family: "Gloria Hallelujah", cursive;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(240, 128, 128);
+}
+
+#main .inspector .topLeftArea .addEventPopup .titleArea {
+  width: 100%;
+  display: flex;
+  font-size: 1.35vw;
+  font-family: "Gloria Hallelujah", cursive;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: rgba(19, 185, 44, 0.424);
+  padding: 7px;
+}
+
+#main .inspector .topLeftArea .addEventPopup .icon {
+  font-size: 28px;
+  margin-right: 10px;
+}
+
+#main .inspector .topLeftArea .addEventPopup .input  {
+  min-width: 200px;
+  width: 75%;
+  font-size: 16px;
+  background-color: transparent;
+  border-radius: 1em;
+  color: rgb(216, 216, 216);
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.653);
+}
+
+#main .inspector .topLeftArea .addEventPopup .select {
+  width: 75%;
+  font-size: 16px;
+  background-color: transparent;
+  border-radius: 1em;
+  color: rgb(216, 216, 216);
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.653);
+}
+
+#main .inspector .topLeftArea .addEventPopup .titleArea .input {
+  min-width: 200px;
+  width: 75%;
+  font-size: 16px;
+  background-color: transparent;
+  border-radius: 1em;
+  color: rgb(216, 216, 216);
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.653);
+}
+
+#main .inspector .topLeftArea .addEventPopup .catLocArea {
+  width: 100%;
+  display: flex;
+}
+
+#main .inspector .topLeftArea .addEventPopup .catLocArea .catArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: red;
+}
+
+
+#main .inspector .topLeftArea .addEventPopup .catLocArea .catArea select {
+  width: 80%;
+}
+
+#main .inspector .topLeftArea .addEventPopup .catLocArea .locArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+#main .inspector .topLeftArea .addEventPopup .catLocArea .locArea input {
+  width: 80%;
+}
+
+#main .inspector .topLeftArea .addEventPopup .datetimeArea {
+  width: 100%;
+  display: flex;
+  font-size: 1.35vw;
+  font-family: "Gloria Hallelujah", cursive;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(240, 128, 128);
+}
+
+#main .inspector .topLeftArea .addEventPopup .Area {
+  width: 100%;
+  display: flex;
+  font-size: 1.35vw;
+  font-family: "Gloria Hallelujah", cursive;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(240, 128, 128);
+}
+
+#main .inspector .topLeftArea .qotd {
+  display: none;
+  width: 100%;
+  height: 100%;
+  background-color: #1e1f22;
   justify-content: center;
   align-items: center;
 }
 
-#main .inspector .qotd .footnote {
+#main .inspector .topLeftArea .qotd .footnote {
   position: absolute;
   left: 10px;
   top: 10px;
@@ -27,6 +145,7 @@
 }
 
 #main .inspector .qotd .content {
+  color: white;
   padding: 15px;
   font-family: "Gloria Hallelujah", cursive;
   font-weight: 800;
@@ -107,6 +226,27 @@
 
 #main .inspector .filters .itinSummary .item.school .label {
   color: #e1b8be;
+}
+
+#main .inspector .filters .right .addEventBtn {
+  color: rgb(160, 160, 160);
+  font-weight: 600;
+  font-size: 1.2vw;
+  border: 1px solid rgb(105, 105, 105);
+  border-radius: 1em;
+  padding: 5px 20px;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  transition: 0.15s ease-in-out;
+}
+
+#main .inspector .filters .right .addEventBtn:hover {
+  color: rgb(196, 196, 196);
+  background-color: rgba(105, 105, 105, 0.482);
+}
+
+#main .inspector .filters .right .addEventPopup {
 }
 
 #main .inspector .itinerary {
