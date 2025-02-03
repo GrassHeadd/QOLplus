@@ -21,14 +21,28 @@
   overflow-y: scroll;
 }
 
+#main .inspector .topLeftArea .addEventPopup::-webkit-scrollbar {
+  width: 8px;
+}
+
+#main .inspector .topLeftArea .addEventPopup::-webkit-scrollbar-thumb {
+  background: rgb(83, 83, 83);
+  border-radius: 1em;
+}
+
+#main .inspector .topLeftArea .addEventPopup::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 #main .inspector .topLeftArea .addEventPopup .topArea {
+  position: relative;
   width: 100%;
   display: flex;
   font-size: 1.35vw;
   font-family: "Gloria Hallelujah", cursive;
   justify-content: center;
   align-items: center;
-  background-color: rgb(240, 128, 128);
+  background-color: rgb(64, 66, 98);
 }
 
 #main .inspector .topLeftArea .addEventPopup .titleArea {
@@ -38,7 +52,6 @@
   font-family: "Gloria Hallelujah", cursive;
   justify-content: flex-start;
   align-items: center;
-  background-color: rgb(240, 128, 128);
   padding: 7px;
 }
 
@@ -48,8 +61,6 @@
 }
 
 #main .inspector .topLeftArea .addEventPopup .input {
-  max-width: 300px;
-  margin-right: 10px;
   flex: 1;
   font-size: 16px;
   background-color: transparent;
@@ -60,14 +71,7 @@
 }
 
 #main .inspector .topLeftArea .addEventPopup select {
-  width: 75%;
-  font-size: 16px;
-  background-color: transparent;
-  border-radius: 1em;
-  color: rgb(216, 216, 216);
-  padding: 3px 10px;
   margin-right: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.653);
 }
 
 #main .inspector .topLeftArea .addEventPopup .catLocArea {
@@ -80,9 +84,7 @@
   flex: 1;
   display: flex;
   align-items: center;
-  background-color:rgb(240, 128, 128);
 }
-
 
 #main .inspector .topLeftArea .addEventPopup .catLocArea .catArea select {
   width: 80%;
@@ -92,7 +94,6 @@
   flex: 1;
   display: flex;
   align-items: center;
-  background-color: rgb(240, 128, 128);
 }
 
 #main .inspector .topLeftArea .addEventPopup .catLocArea .locArea input {
@@ -102,16 +103,11 @@
 #main .inspector .topLeftArea .addEventPopup .datetimeArea {
   width: calc(100% - 14px);
   display: flex;
-  font-size: 1.35vw;
-  font-family: "Gloria Hallelujah", cursive;
-  justify-content: center;
-  align-items: center;
-  background-color: rgb(240, 128, 128);
   padding: 7px;
 }
 
-#main .inspector .topLeftArea .addEventPopup .datetimeArea .StartDate,
-#main .inspector .topLeftArea .addEventPopup .datetimeArea .EndDate
+#main .inspector .topLeftArea .addEventPopup .datetimeArea .startArea,
+#main .inspector .topLeftArea .addEventPopup .datetimeArea .endArea
 {
   flex: 1;
   display: flex;
@@ -119,8 +115,26 @@
   font-family: "Gloria Hallelujah", cursive;
   justify-content: center;
   align-items: center;
-  background-color: rgb(240, 128, 128);
 }
+
+#main .inspector .topLeftArea .addEventPopup .datetimeArea .startArea input {
+  margin-right: 10px;
+}
+
+#main .inspector .topLeftArea .addEventPopup .datetimeArea input {
+  width: 80%;
+}
+
+#main .inspector .topLeftArea .addEventPopup .notesArea {
+  width: calc(100% - 14px);
+  padding: 7px;
+  display: flex;
+}
+
+#main .inspector .topLeftArea .addEventPopup .notesArea textarea {
+  border-radius: 0.5em;
+}
+
 
 #main .inspector .topLeftArea .qotd {
   display: none;
@@ -240,9 +254,6 @@
 #main .inspector .filters .right .addEventBtn:hover {
   color: rgb(196, 196, 196);
   background-color: rgba(105, 105, 105, 0.482);
-}
-
-#main .inspector .filters .right .addEventPopup {
 }
 
 #main .inspector .itinerary {
