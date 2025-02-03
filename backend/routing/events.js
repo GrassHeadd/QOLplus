@@ -23,7 +23,7 @@ thisRoute.get("/:userId/:monthyear", async (request, response) => {
 thisRoute.post("/", async (request, response) => {
     const { userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
 
-    if (category == null) category = "Others";
+    // if (category == null) category = "Others";
   
     try {
     const { data, error } = await supabase.from("events").insert({
@@ -60,5 +60,32 @@ thisRoute.delete("/:eventId", async (request, response) => {
         response.status(500).json({ error: 'Internal server error, unable to delete' });
     }
 });
+
+thisRoute.put("/:eventId", async (request, response) => {
+    const { eventId, userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
+    console.log(request.body);
+    
+
+    // if (category == null) category = "Others";
+    try {
+        const { data, error } = await supabase.from("events").eq("event_id", eventId).update({
+            user_id: userId,
+            title: title,
+            location: location,
+            notes: notes,
+            category: category,
+            start_monthyear: startMonthYear,
+            end_monthyear: endMonthYear,
+            start_dayofmonth: startDOM,
+            end_dayofmonth: endDOM,
+            start_time: startTime,
+            end_time: endTime
+        })
+        response.status(200).json(data);
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+})
 
 module.exports = thisRoute;
