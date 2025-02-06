@@ -305,6 +305,7 @@
 #main .inspector .filters .right .addEventBtn:hover {
   color: rgb(196, 196, 196);
   background-color: rgba(105, 105, 105, 0.482);
+  cursor: pointer;
 }
 
 #main .inspector .itinerary {

@@ -1,5 +1,3 @@
-const e = require("express");
-
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
   loadInitialMonths(3);
@@ -101,7 +99,7 @@ function indicateCurrentDay() {
 async function loadEvents() {
   try {
     const userId = 1;
-    const monthyear = 202412;
+    const monthyear = 202501;
     const response = await fetch("http://localhost:3000/events/" + userId + "/" + monthyear);
     // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
     const data = await response.json();
@@ -112,10 +110,21 @@ async function loadEvents() {
     var eventItinElems = [], eventRowElems = [];
 
     /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
-    events.sort((event1, event2) => getDateFromFormatted(event1.start_dayofmonth, event1.start_monthyear).getTime() - getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
+    events.sort((event1, event2) => 
+      getDateFromFormatted(event1.start_dayofmonth, event1.start_monthyear).getTime() -
+      getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
 
     events.forEach(event => {
-      const title = event.title, category = event.category, startDOM = event.start_dayofmonth, endDOM = event.end_dayofmonth, startTime = event.start_time, endTime = event.end_time, startMY = event.start_monthyear, endMY = event.end_monthyear, location = event.location, notes = event.notes;
+      const title = event.title, 
+            category = event.category, 
+            startDOM = event.start_dayofmonth, 
+            endDOM = event.end_dayofmonth, 
+            startTime = event.start_time, 
+            endTime = event.end_time,
+            startMY = event.start_monthyear, 
+            endMY = event.end_monthyear,
+            location = event.location,
+            notes = event.notes;
 
       var rowElems = [];
 
@@ -135,14 +144,26 @@ async function loadEvents() {
         '  </div>' +
         '</div>';
 
-      document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].insertAdjacentHTML("beforeend", eventElement);
-      const allItinElems = document.getElementById("main").getElementsByClassName("inspector")[0].getElementsByClassName("itinerary")[0].getElementsByClassName("item"), eventItenElem = allItinElems[allItinElems.length - 1];
-      eventItenElem.getElementsByClassName("left")[0].style.backgroundColor = colourStr;
+      document.getElementById("main").getElementsByClassName("inspector")[0]
+      .getElementsByClassName("itinerary")[0]
+      .insertAdjacentHTML("beforeend", eventElement);
+      const allItinElems = document.getElementById("main")
+      .getElementsByClassName("inspector")[0]
+      .getElementsByClassName("itinerary")[0]
+      .getElementsByClassName("item"), 
+      eventItenElem = allItinElems[allItinElems.length - 1];
+      eventItenElem.getElementsByClassName("left")[0]
+      .style.backgroundColor = colourStr;
 
-      var startDate = getDateFromFormatted(startDOM, startMY), endDate = getDateFromFormatted(endDOM, endMY);
+      var startDate = getDateFromFormatted(startDOM, startMY), 
+          endDate = getDateFromFormatted(endDOM, endMY);
       var dayCount = getDayNumBetween(startDate, endDate);
 
-      const parentDayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(startDate.toDateString().replaceAll(" ", ""))[0];
+      const parentDayElem = document.getElementById("main")
+      .getElementsByClassName("calendar")[0]
+      .getElementsByClassName("bottom")[0]
+      .getElementsByClassName(startDate.toDateString()
+      .replaceAll(" ", ""))[0];
       var curDate = new Date(startDate.getTime());
       var nextSundayDelta = getNextSundayDelta(curDate);
 
@@ -158,7 +179,11 @@ async function loadEvents() {
         var curRowLength = Math.min(7, dayCount);
         var mondayDate = new Date(startDate.getTime());
         mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
-        const mondayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName(mondayDate.toDateString().replaceAll(" ", ""))[0];
+        const mondayElem = document.getElementById("main")
+        .getElementsByClassName("calendar")[0]
+        .getElementsByClassName("bottom")[0]
+        .getElementsByClassName(mondayDate.toDateString()
+        .replaceAll(" ", ""))[0];
         dayCount -= curRowLength;
         const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colourStr, false, dayCount == 0);
         rowElems.push(curRowRibbon);
@@ -174,13 +199,15 @@ async function loadEvents() {
 
       itinElem.addEventListener("mouseenter", event => {
         eventRowElems[index].forEach(rowElem => {
-          if (!rowElem.classList.contains("active")) rowElem.classList.add("active");
+          if (!rowElem.classList.contains("active"))
+             rowElem.classList.add("active");
         });
       });
 
       itinElem.addEventListener("mouseleave", event => {
         eventRowElems[index].forEach(rowElem => {
-          if (rowElem.classList.contains("active")) rowElem.classList.remove("active");
+          if (rowElem.classList.contains("active")) 
+            rowElem.classList.remove("active");
         });
       });
     });
@@ -190,13 +217,15 @@ async function loadEvents() {
       rowGroup.forEach(rowItem => {
         rowItem.addEventListener("mouseenter", event => {
           rowGroup.forEach(eachRowItem => {
-            if (!eachRowItem.classList.contains("active")) eachRowItem.classList.add("active");
+            if (!eachRowItem.classList.contains("active")) 
+              eachRowItem.classList.add("active");
           });
         });
 
         rowItem.addEventListener("mouseleave", event => {
           rowGroup.forEach(eachRowItem => {
-            if (eachRowItem.classList.contains("active")) eachRowItem.classList.remove("active");
+            if (eachRowItem.classList.contains("active")) 
+              eachRowItem.classList.remove("active");
           });
         });
       });
@@ -226,35 +255,62 @@ function handleAddEventButton() {
   })
 
   const confirmPopupBtnElem = document.getElementById("confirmEventPopupBtn");
-  confirmPopupBtnElem.addEventLister("click", async (event) => {
+  confirmPopupBtnElem.addEventListener("click", async (event) => {
     const title = document.getElementById("eventTitleInput").value,
-        location = document.getElementById("eventLocInput").value,
-        notes = document.getElementById("eventNotesInput").value,
-        category = document.getElementById("eventCategoryInput").value,
-        startDate = document.getElementById("eventStartDateInput").value,
-        endDate = document.getElementById("eventEndDateInput").value;
+          location = document.getElementById("eventLocInput").value,
+          notes = document.getElementById("eventNotesInput").value,
+          category = document.getElementById("eventCategoryInput").value,
+          startDateUnformated = document.getElementById("eventStartDateInput").value,
+          endDateUnformated = document.getElementById("eventEndDateInput").value,
+          userId = 1;
+
+    // Date input format: 
+    //HHMM DD/MM/YYYY 
+
+    const startDateObj = getDateFromInputFieldFormat(startDateUnformated),
+          endDateObj = getDateFromInputFieldFormat(endDateUnformated); 
+
+    const startMonthYear = getYYYYMMFromDateObj(startDateObj),
+          startDOM = startDateObj.getDate(),
+          startTime = parseInt(startDateObj.getHours() + "" 
+          + startDateObj.getMinutes() < 10 
+          ? "0" + startDateObj.getMinutes() 
+          : startDateObj.getMinutes());
+
+
+    const endMonthYear = getYYYYMMFromDateObj(endDateObj),
+          endDOM = endDateObj.getDate(),
+          endTime = parseInt(endDateObj.getHours() + "" 
+          + endDateObj.getMinutes() < 10 
+          ? "0" + endDateObj.getMinutes() 
+          : endDateObj.getMinutes());
+    
+    console.log("startMonthYear", startMonthYear);
+    console.log("endMonthYear", endMonthYear);
+
     try {
-      const response = await fetch("http://localhost:3000/events/" + userId + "/" + monthyear, {
+      const response = await fetch("http://localhost:3000/events/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
         body: JSON.stringify({
-          userId: 1,
+          userId: userId,
           title: title, 
           location: location, 
           notes: notes, 
           category: category, 
-          startMonthYear: startDate, 
-          endMonthYear: endDate, 
-          startDOM: startDate, 
-          endDOM: endDate, 
+          startMonthYear: startMonthYear, 
+          endMonthYear: endMonthYear, 
+          startDOM: startDOM, 
+          endDOM: endDOM, 
           startTime: startTime, 
           endTime: endTime
         })
       });
-      const data = await response.json;
+      const data = await response.json();
+      console.log("Response", data);
       
     // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
     } catch (error) {
@@ -278,7 +334,8 @@ function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasR
     `</div>`;
 
   dayElem.insertAdjacentHTML('beforeend', eventRibbonElemStr);
-  const allDayEvents = dayElem.getElementsByClassName("eventRibbon"), eventRibbonElem = allDayEvents[allDayEvents.length - 1];
+  const allDayEvents = dayElem.getElementsByClassName("eventRibbon"), 
+        eventRibbonElem = allDayEvents[allDayEvents.length - 1];
 
   if (!hasLeftMargin) {
     eventRibbonElem.style.marginLeft = 0;
@@ -292,8 +349,11 @@ function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasR
     eventRibbonElem.style.borderBottomRightRadius = 0;
   }
 
-  eventRibbonElem.getElementsByClassName("indicator")[0].style.backgroundColor = colourStr;
-  eventRibbonElem.style.width = "calc(" + (100 * length) + "% - " + (hasLeftMargin ? (hasRightMargin ? 28 : 18) : (hasRightMargin ? 18 : 8)) + "px)";
+  eventRibbonElem.getElementsByClassName("indicator")[0]
+  .style.backgroundColor = colourStr;
+  eventRibbonElem.style.width = "calc(" + (100 * length) + "% - " + (hasLeftMargin 
+  ? (hasRightMargin ? 28 : 18) 
+  : (hasRightMargin ? 18 : 8)) + "px)";
 
   return eventRibbonElem;
 }
@@ -305,9 +365,13 @@ function getRandomColourStr(colourStrs) {
 
   var similarFound = false;
   for (var i = 0; i < colourStrs.length; i++) {
-    var otherStrParts = colourStrs[i].replaceAll("rgb(", "").replaceAll(")", "").replaceAll(" ", "").split(",");
-    var otherR = parseInt(otherStrParts[0]), otherG = parseInt(otherStrParts[1]), otherB = parseInt(otherStrParts[2]);
-    if (Math.abs(r - otherR) <= 10 && Math.abs(g - otherG) <= 10 && Math.abs(b - otherB) <= 10) {
+    var otherStrParts = colourStrs[i].replaceAll("rgb(", "")
+    .replaceAll(")", "").replaceAll(" ", "").split(",");
+    var otherR = parseInt(otherStrParts[0]), 
+    otherG = parseInt(otherStrParts[1]), otherB = parseInt(otherStrParts[2]);
+    if (Math.abs(r - otherR) <= 10
+    && Math.abs(g - otherG) <= 10
+    && Math.abs(b - otherB) <= 10) {
       similarFound = true;
       break;
     }
@@ -333,10 +397,53 @@ function getNextSundayDelta(date) {
 
 // Get Date Object given DOM and MY
 function getDateFromFormatted(dom, my) {
-  return new Date(parseInt((my + "").slice(0, 4)), parseInt((my + "").slice(4, 6)) - 1, dom);
+  return new Date(parseInt((my + "").slice(0, 4)), 
+                  parseInt((my + "").slice(4, 6)) - 1, dom);
+}
+
+function getYYYYMMFromDateObj(dateObj) {
+  return parseInt(dateObj.getFullYear() + "" + ((dateObj.getMonth() + 1) < 10 
+  ? "0" + (dateObj.getMonth() + 1) 
+  : (dateObj.getMonth() + 1)));
 }
 
 // Get number of days between start date and end date + 1 (so if it's the same day it'll be 1)
 function getDayNumBetween(startDate, endDate) {
   return Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
+}
+
+// Returns JavaScript Object from user input field in the format HHMM DD/MM/YYYY
+function getDateFromInputFieldFormat(input) {
+  const hhmmStr = input.split(" ")[0], ddmmyyyyStr = input.split(" ")[1];
+  const hr = parseInt(hhmmStr.slice(0, 2)), min = parseInt(hhmmStr.slice(2, 4));
+  if (hr < 0 || hr > 23) {
+    alert("hour is kinda scuffed");
+    return null;
+  }
+  if (min < 0 || hr > 59) {
+    alert("minute is kinda scuffed");
+    return null;
+  }
+  
+  // 2359 31/ 12/2012 [31, 12, 2012]
+
+  const dd = parseInt(ddmmyyyyStr.split("/")[0]) //"31"
+  if (dd < 1 || dd > 31) {
+    alert("Your father");
+    return null;
+  }
+  const mm = parseInt(ddmmyyyyStr.split("/")[1])// "12"
+  if (mm < 1 || mm > 12) {
+    alert("Your mother");
+    return null;
+  }
+  var yyyy = parseInt(ddmmyyyyStr.split("/")[2]) // "2012" /25
+  if (ddmmyyyyStr.split("/")[2].length == 2) {
+    yyyy += 2000;    
+  } else if (!ddmmyyyyStr.split("/")[2].length == 4) {
+    alert("Screw you enter a proper year format :/ (i.e. either YY or YYYY)");
+    return null;
+  }
+
+  return new Date(yyyy, mm - 1, dd, hr, min, 0);
 }
