@@ -10,15 +10,16 @@
 
 #main .inspector .topLeftArea {
   width: 100%;
-  height: 250px;
+  height: 305px;
   color: white;
 }
 
 /* Event Popup Area */
 #main .inspector .topLeftArea .addEventPopup {
+  display: none;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
 }
 
 #main .inspector .topLeftArea .addEventPopup::-webkit-scrollbar {
@@ -43,6 +44,43 @@
   justify-content: center;
   align-items: center;
   background-color: rgb(64, 66, 98);
+}
+
+#main .inspector .topLeftArea .addEventPopup .topArea .eventActionBtns {
+  top: 0;
+  right: 0;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#main .inspector .topLeftArea .addEventPopup .topArea .eventActionBtns .confirmBtn span {
+  font-size: 20px;
+  color: rgb(62, 209, 62);
+  border: 1px solid white;
+  border-radius: 50%;
+  transition: 0.15s ease-in-out;
+  padding: 5px;
+}
+
+#main .inspector .topLeftArea .addEventPopup .topArea .eventActionBtns .closeBtn span {
+  font-size: 20px;
+  color: rgb(255, 101, 101);
+  border: 1px solid white;
+  border-radius: 50%;
+  padding: 5px;
+  transition: 0.15s ease-in-out;
+}
+
+#main .inspector .topLeftArea .addEventPopup .topArea .eventActionBtns .confirmBtn span:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.611);
+}
+
+#main .inspector .topLeftArea .addEventPopup .topArea .eventActionBtns .closeBtn span:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.611);
 }
 
 #main .inspector .topLeftArea .addEventPopup .titleArea {
@@ -137,7 +175,7 @@
 
 
 #main .inspector .topLeftArea .qotd {
-  display: none;
+  display: flex;
   width: 100%;
   height: 100%;
   background-color: #1e1f22;
@@ -167,7 +205,7 @@
   background-color: darkcyan;
   margin-right: 3em;
   height: 55px;
-  display: flex;
+  display: none;
 }
 
 #main .inspector .focusAreaTabs .focusArea {
@@ -236,6 +274,19 @@
 
 #main .inspector .filters .itinSummary .item.school .label {
   color: #e1b8be;
+}
+
+#main .inspector .filters .right .addEventPopup {
+  color: rgb(160, 160, 160);
+  font-weight: 600;
+  font-size: 1.2vw;
+  border: 1px solid rgb(105, 105, 105);
+  border-radius: 1em;
+  padding: 5px 20px;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  transition: 0.15s ease-in-out;
 }
 
 #main .inspector .filters .right .addEventBtn {

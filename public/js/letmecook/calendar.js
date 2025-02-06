@@ -1,9 +1,12 @@
+const e = require("express");
+
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
   loadInitialMonths(3);
   loadOtherMonths();
   loadEvents();
   indicateCurrentDay();
+  handleAddEventButton();
   //testEventRow();
 });
 
@@ -202,6 +205,63 @@ async function loadEvents() {
   } catch (error) {
     console.error('Error:', error.message);
   }
+}
+
+function handleAddEventButton() {
+  const popupToggleBtn = document.getElementById("addEventBtn");
+  const addEventPopupElem = document.getElementsByClassName("addEventPopup")[0];
+  const qotdElem = document.getElementsByClassName("qotd")[0];
+  var isPopup = false;
+  popupToggleBtn.addEventListener("click", (event) => {
+    isPopup = !isPopup;
+    qotdElem.style.display = isPopup ? "none" : "flex";
+    addEventPopupElem.style.display = isPopup ? "flex" : "none";
+  });
+
+  const closePopupBtnElem = document.getElementById("closeEventPopupBtn");
+  closePopupBtnElem.addEventListener("click", (event) => {
+    isPopup = !isPopup;
+    qotdElem.style.display = isPopup ? "none" : "flex";
+    addEventPopupElem.style.display = isPopup ? "flex" : "none";
+  })
+
+  const confirmPopupBtnElem = document.getElementById("confirmEventPopupBtn");
+  confirmPopupBtnElem.addEventLister("click", async (event) => {
+    const title = document.getElementById("eventTitleInput").value,
+        location = document.getElementById("eventLocInput").value,
+        notes = document.getElementById("eventNotesInput").value,
+        category = document.getElementById("eventCategoryInput").value,
+        startDate = document.getElementById("eventStartDateInput").value,
+        endDate = document.getElementById("eventEndDateInput").value;
+    try {
+      const response = await fetch("http://localhost:3000/events/" + userId + "/" + monthyear, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          userId: 1,
+          title: title, 
+          location: location, 
+          notes: notes, 
+          category: category, 
+          startMonthYear: startDate, 
+          endMonthYear: endDate, 
+          startDOM: startDate, 
+          endDOM: endDate, 
+          startTime: startTime, 
+          endTime: endTime
+        })
+      });
+      const data = await response.json;
+      
+    // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
 }
 
 // Creates an Event Ribbon at the given HTML Element of the specific day

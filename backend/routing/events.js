@@ -13,7 +13,7 @@ thisRoute.get("/:userId/:monthyear", async (request, response) => {
       const { data, error } = await supabase.from("events").select("*").eq("user_id", userId).lte("start_monthyear", monthyear).gte("end_monthyear", monthyear);
 
       if (error) { throw error; }
-      response.json({ data });
+      response.status(200).json({ data });
   } catch (error) {
       console.error('Error:', error.message);
       response.status(500).json({ error: 'Internal server error' });
@@ -27,7 +27,7 @@ thisRoute.post("/", async (request, response) => {
   
     try {
     const { data, error } = await supabase.from("events").insert({
-        user_id: userId,
+        userId: userId,
         title: title,
         location: location,
         notes: notes,
@@ -41,7 +41,6 @@ thisRoute.post("/", async (request, response) => {
     });
   
     if (error) throw error;
-    
     response.json({ data });
 } catch (error) {
     console.error('Error:', error.message);
@@ -62,30 +61,31 @@ thisRoute.delete("/:eventId", async (request, response) => {
 });
 
 thisRoute.put("/:eventId", async (request, response) => {
-    const { eventId, userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
-    console.log(request.body);
-    
-
-    // if (category == null) category = "Others";
+    const { event_id, userId, title, location, notes, category, start_monthyear, end_monthyear, start_dayofmonth, end_dayofmonth, start_time, end_time } = request.body;
+       
     try {
-        const { data, error } = await supabase.from("events").eq("event_id", eventId).update({
-            user_id: userId,
+        const { data, error } = await supabase.from("events").update({
+            userId: userId,
             title: title,
             location: location,
             notes: notes,
             category: category,
-            start_monthyear: startMonthYear,
-            end_monthyear: endMonthYear,
-            start_dayofmonth: startDOM,
-            end_dayofmonth: endDOM,
-            start_time: startTime,
-            end_time: endTime
-        })
+            start_monthyear: start_monthyear,
+            end_monthyear: end_monthyear,
+            start_dayofmonth: start_dayofmonth,
+            end_dayofmonth: end_dayofmonth,
+            start_time: start_time,
+            end_time: end_time
+        }).eq("event_id", event_id);
+
+        if (error) throw error;
         response.status(200).json(data);
+
     } catch (error) {
         console.error('Error:', error.message);
         response.status(500).json({ error: 'Internal server error' });
     }
-})
+});
+
 
 module.exports = thisRoute;
