@@ -1,19 +1,17 @@
+import * as DateUtils from "../utils/date.js";
+import * as ColorUtils from "../utils/color.js";
+
+import * as addEvent from "./addEvent.js";
+
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
   loadInitialMonths(3);
   loadOtherMonths();
   loadEvents();
   indicateCurrentDay();
-  handleAddEventButton();
-  //testEventRow();
-});
 
-/* [RR's Thonkang Stuff] Calendar Area Behaviour:
-- Allows default scrolling behaviour
-- Upon release, corrects view by auto-snapping to a week's row (if scrolling past half of row X, snap that row, if not, scnap to the row above it)
-  - Snapping is transitive, not instant (i.e. there's an animation)
-- At any point of time of non-scrolling & non-snapping transition, there will always be 35 days visible on the screen
-*/
+  addEvent.setupAddEventBtn();
+});
 
 function loadInitialMonths(plusMinusAmt) {
   /* =================[ vv Variable Setup vv ]================= */
@@ -96,6 +94,10 @@ function indicateCurrentDay() {
 }
 
 // Handles event fetching from backend & frontend displaying of events
+/**
+ * Load 
+ * 
+ */
 async function loadEvents() {
   try {
     const userId = 1;
@@ -111,8 +113,8 @@ async function loadEvents() {
 
     /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
     events.sort((event1, event2) => 
-      getDateFromFormatted(event1.start_dayofmonth, event1.start_monthyear).getTime() -
-      getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
+      DateUtils.getDateFromFormatted(event1.start_dayofmonth, event1.start_monthyear).getTime() -
+      DateUtils.getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
 
     events.forEach(event => {
       const title = event.title, 
@@ -129,7 +131,7 @@ async function loadEvents() {
       var rowElems = [];
 
       /* 2 Generate a random colour for each event */
-      const colourStr = getRandomColourStr(eventColours);
+      const colourStr = ColorUtils.getRandomColorStr(eventColours);
       eventColours.push(colourStr);
 
       /* 3. Generate Itinerary item */
@@ -155,9 +157,9 @@ async function loadEvents() {
       eventItenElem.getElementsByClassName("left")[0]
       .style.backgroundColor = colourStr;
 
-      var startDate = getDateFromFormatted(startDOM, startMY), 
-          endDate = getDateFromFormatted(endDOM, endMY);
-      var dayCount = getDayNumBetween(startDate, endDate);
+      var startDate = DateUtils.getDateFromFormatted(startDOM, startMY), 
+          endDate = DateUtils.getDateFromFormatted(endDOM, endMY);
+      var dayCount = DateUtils.getDayNumBetween(startDate, endDate);
 
       const parentDayElem = document.getElementById("main")
       .getElementsByClassName("calendar")[0]
@@ -165,7 +167,7 @@ async function loadEvents() {
       .getElementsByClassName(startDate.toDateString()
       .replaceAll(" ", ""))[0];
       var curDate = new Date(startDate.getTime());
-      var nextSundayDelta = getNextSundayDelta(curDate);
+      var nextSundayDelta = DateUtils.getNextSundayDelta(curDate);
 
       /* 4. Generate the first row's ribbon  */
       const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
@@ -236,90 +238,6 @@ async function loadEvents() {
   }
 }
 
-function handleAddEventButton() {
-  const popupToggleBtn = document.getElementById("addEventBtn");
-  const addEventPopupElem = document.getElementsByClassName("addEventPopup")[0];
-  const qotdElem = document.getElementsByClassName("qotd")[0];
-  var isPopup = false;
-  popupToggleBtn.addEventListener("click", (event) => {
-    isPopup = !isPopup;
-    qotdElem.style.display = isPopup ? "none" : "flex";
-    addEventPopupElem.style.display = isPopup ? "flex" : "none";
-  });
-
-  const closePopupBtnElem = document.getElementById("closeEventPopupBtn");
-  closePopupBtnElem.addEventListener("click", (event) => {
-    isPopup = !isPopup;
-    qotdElem.style.display = isPopup ? "none" : "flex";
-    addEventPopupElem.style.display = isPopup ? "flex" : "none";
-  })
-
-  const confirmPopupBtnElem = document.getElementById("confirmEventPopupBtn");
-  confirmPopupBtnElem.addEventListener("click", async (event) => {
-    const title = document.getElementById("eventTitleInput").value,
-          location = document.getElementById("eventLocInput").value,
-          notes = document.getElementById("eventNotesInput").value,
-          category = document.getElementById("eventCategoryInput").value,
-          startDateUnformated = document.getElementById("eventStartDateInput").value,
-          endDateUnformated = document.getElementById("eventEndDateInput").value,
-          userId = 1;
-
-    // Date input format: 
-    //HHMM DD/MM/YYYY 
-
-    const startDateObj = getDateFromInputFieldFormat(startDateUnformated),
-          endDateObj = getDateFromInputFieldFormat(endDateUnformated); 
-
-    const startMonthYear = getYYYYMMFromDateObj(startDateObj),
-          startDOM = startDateObj.getDate(),
-          startTime = parseInt(startDateObj.getHours() + "" 
-          + startDateObj.getMinutes() < 10 
-          ? "0" + startDateObj.getMinutes() 
-          : startDateObj.getMinutes());
-
-
-    const endMonthYear = getYYYYMMFromDateObj(endDateObj),
-          endDOM = endDateObj.getDate(),
-          endTime = parseInt(endDateObj.getHours() + "" 
-          + endDateObj.getMinutes() < 10 
-          ? "0" + endDateObj.getMinutes() 
-          : endDateObj.getMinutes());
-    
-    console.log("startMonthYear", startMonthYear);
-    console.log("endMonthYear", endMonthYear);
-
-    try {
-      const response = await fetch("http://localhost:3000/events/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          userId: userId,
-          title: title, 
-          location: location, 
-          notes: notes, 
-          category: category, 
-          startMonthYear: startMonthYear, 
-          endMonthYear: endMonthYear, 
-          startDOM: startDOM, 
-          endDOM: endDOM, 
-          startTime: startTime, 
-          endTime: endTime
-        })
-      });
-      const data = await response.json();
-      console.log("Response", data);
-      
-    // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-}
-
 // Creates an Event Ribbon at the given HTML Element of the specific day
 function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasRightMargin) {
   const title = event.title, startTime = event.start_time;
@@ -356,94 +274,4 @@ function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasR
   : (hasRightMargin ? 18 : 8)) + "px)";
 
   return eventRibbonElem;
-}
-
-// TODO: Improve colour similarity checker (e.g. shades of green that are too close won't be accepted)
-function getRandomColourStr(colourStrs) {
-  var r = Math.round(Math.random() * 255), g = Math.round(Math.random() * 255), b = Math.round(Math.random() * 255);
-  var colourStr = "rgb(" + r + ", " + g + ", " + b + ")";
-
-  var similarFound = false;
-  for (var i = 0; i < colourStrs.length; i++) {
-    var otherStrParts = colourStrs[i].replaceAll("rgb(", "")
-    .replaceAll(")", "").replaceAll(" ", "").split(",");
-    var otherR = parseInt(otherStrParts[0]), 
-    otherG = parseInt(otherStrParts[1]), otherB = parseInt(otherStrParts[2]);
-    if (Math.abs(r - otherR) <= 10
-    && Math.abs(g - otherG) <= 10
-    && Math.abs(b - otherB) <= 10) {
-      similarFound = true;
-      break;
-    }
-  }
-
-  return similarFound ? getRandomColourStr(colourStrs) : colourStr;
-}
-
-// Formats time in a HHMMhrs format (since it deletes trailing 0s)
-function formatTime(timeInt) {
-  var string = "";
-  if (timeInt % 10 < 10) {
-    string += "0";
-  }
-  string += timeInt;
-  return string + "hr";
-}
-
-// Get number of days until the next sunday in the week
-function getNextSundayDelta(date) {
-  return 7 - (date.getDay() == 0 ? 7 : date.getDay());
-}
-
-// Get Date Object given DOM and MY
-function getDateFromFormatted(dom, my) {
-  return new Date(parseInt((my + "").slice(0, 4)), 
-                  parseInt((my + "").slice(4, 6)) - 1, dom);
-}
-
-function getYYYYMMFromDateObj(dateObj) {
-  return parseInt(dateObj.getFullYear() + "" + ((dateObj.getMonth() + 1) < 10 
-  ? "0" + (dateObj.getMonth() + 1) 
-  : (dateObj.getMonth() + 1)));
-}
-
-// Get number of days between start date and end date + 1 (so if it's the same day it'll be 1)
-function getDayNumBetween(startDate, endDate) {
-  return Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
-}
-
-// Returns JavaScript Object from user input field in the format HHMM DD/MM/YYYY
-function getDateFromInputFieldFormat(input) {
-  const hhmmStr = input.split(" ")[0], ddmmyyyyStr = input.split(" ")[1];
-  const hr = parseInt(hhmmStr.slice(0, 2)), min = parseInt(hhmmStr.slice(2, 4));
-  if (hr < 0 || hr > 23) {
-    alert("hour is kinda scuffed");
-    return null;
-  }
-  if (min < 0 || hr > 59) {
-    alert("minute is kinda scuffed");
-    return null;
-  }
-  
-  // 2359 31/ 12/2012 [31, 12, 2012]
-
-  const dd = parseInt(ddmmyyyyStr.split("/")[0]) //"31"
-  if (dd < 1 || dd > 31) {
-    alert("Your father");
-    return null;
-  }
-  const mm = parseInt(ddmmyyyyStr.split("/")[1])// "12"
-  if (mm < 1 || mm > 12) {
-    alert("Your mother");
-    return null;
-  }
-  var yyyy = parseInt(ddmmyyyyStr.split("/")[2]) // "2012" /25
-  if (ddmmyyyyStr.split("/")[2].length == 2) {
-    yyyy += 2000;    
-  } else if (!ddmmyyyyStr.split("/")[2].length == 4) {
-    alert("Screw you enter a proper year format :/ (i.e. either YY or YYYY)");
-    return null;
-  }
-
-  return new Date(yyyy, mm - 1, dd, hr, min, 0);
 }

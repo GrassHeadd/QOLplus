@@ -32,20 +32,17 @@ thisRoute.get("/:userId/:monthyear", async (request, response) => {
 });
 
 thisRoute.post("/", async (request, response) => {
-  const { user_d, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
+  const { user_id, exercise_name, exercise_structure, exercise_date } = request.body;
 
   // if (category == null) category = "Others";
 
   try {
   const { data, error } = await supabase.from("events").insert({
-      user_id: userId,
-      exercise_id: exercise_id,
+      user_id: user_id,
       exercise_name: exercise_name,
       exercise_structure: exercise_structure,
-      // exercise_date: exercise_date,
+      exercise_date: exercise_date
   });
-
-  if (error) throw error;
   
   response.json({ data });
 } catch (error) {
