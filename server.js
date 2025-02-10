@@ -8,6 +8,9 @@ dotenv.config();
 
 // Individual sub-files
 const events = require("./backend/routing/events.js");
+const gym = require("./backend/routing/gym.js");
+// const food = require("./backend/routing/food.js");
+const expenses = require("./backend/routing/expenses.js");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +19,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/events", events);
+app.use("/gym", gym);
+// app.use("/food", food);
+app.use("/expenses", expenses);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

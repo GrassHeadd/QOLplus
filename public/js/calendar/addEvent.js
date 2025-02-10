@@ -29,9 +29,6 @@ export function setupAddEventBtn() {
             endDateUnformated = document.getElementById("eventEndDateInput").value,
             userId = 1;
 
-        // Date input format: 
-        //HHMM DD/MM/YYYY 
-
         const startDateObj = DateUtils.getDateFromInputFieldFormat(startDateUnformated),
             endDateObj = DateUtils.getDateFromInputFieldFormat(endDateUnformated);
 

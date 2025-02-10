@@ -16,38 +16,111 @@ const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-thisRoute.get("/:userId/:monthyear", async (request, response) => {
-  try {
-    const userId = request.params.userId;
-    const monthyear = request.params.monthyear;
 
-    const { data, error } = await supabase.from("gym").select("*").eq("user_id", userId).lte("start_monthyear", monthyear).gte("end_monthyear", monthyear);
+//get gym data for a user for a specific monthyear
+// thisRoute.get("/:userId/:monthYear", async (request, response) => {
+//     try {
+//         const userId = request.params.userId;
+//         const monthYear = request.params.monthYear;
 
-    if (error) { throw error; }
+//         const { data } = await supabase.from("gym").select("*").eq("userId", userId).lte("startMonthYear", monthYear).gte("endMonthYear", monthYear);
+
+//         response.json({ data });
+        
+//     } catch (error) {
+//         console.error('Error:', error.message);
+//         response.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
+//get all gym data for a user
+thisRoute.get("/:userId", async (request, response) => {
+    try {
+        const userId = request.params.userId;
+
+        const { data } = await supabase.from("gym").select("*").eq("userId", userId);
+
+        response.json({ data });
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error' });
+}
+});
+
+//get a specific gym event
+thisRoute.get("/:userId/:exerciseId", async (request, response) => {
+    try {
+        const userId = request.params.userId;
+        const exerciseId = request.params.exerciseId;
+
+        const { data } = await supabase.from("gym").select("*").eq("userId", userId).eq("exerciseId", exerciseId);
+
+        response.json({ data });
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+//todo: get a week of gym data for a user
+
+//post gym data
+thisRoute.post("/", async (request, response) => {
+    const { userId, exerciseName, exerciseStructure, exerciseDate } = request.body;
+
+    try {
+    const { data } = await supabase.from("gym").insert({
+        userId: userId,
+        exerciseName: exerciseName,
+        exerciseStructure: exerciseStructure,
+        exerciseDate: exerciseDate
+        //no need exerciseId, supabase will auto generate
+    });
+
     response.json({ data });
-} catch (error) {
+
+    } catch (error) {
     console.error('Error:', error.message);
     response.status(500).json({ error: 'Internal server error' });
-}
+    }
 });
 
-thisRoute.post("/", async (request, response) => {
-  const { user_id, exercise_name, exercise_structure, exercise_date } = request.body;
+//delete a specific gym event
+thisRoute.delete("/:exerciseId", async (request, response) => {
+    const exerciseId = request.params.exerciseId;
 
-  // if (category == null) category = "Others";
+    try {
 
-  try {
-  const { data, error } = await supabase.from("events").insert({
-      user_id: user_id,
-      exercise_name: exercise_name,
-      exercise_structure: exercise_structure,
-      exercise_date: exercise_date
-  });
-  
-  response.json({ data });
-} catch (error) {
-  console.error('Error:', error.message);
-  response.status(500).json({ error: 'Internal server error' });
-}
+        const { data, error } = await supabase.from("gym").delete().eq("exerciseId", exerciseId);
+        data ? response.json({ data }) : response.status(404).json(error);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error, unable to delete' });
+    }
 });
 
+//edit a event
+thisRoute.put("/:exerciseId", async (request, response) => {
+    const { userId, exerciseName, exerciseStructure, exerciseDate } = request.body;
+       
+    try {
+        const { data } = await supabase.from("gym").insert({
+            userId: userId,
+            exerciseName: exerciseName,
+            exerciseStructure: exerciseStructure,
+            exerciseDate: exerciseDate
+        });
+
+        response.status(200).json(data);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+module.exports = thisRoute;
