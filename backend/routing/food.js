@@ -9,25 +9,13 @@
 
 
 //post request for the calculation
+const thisRoute = require("express").Router();
+
+const { createClient } = require('@supabase/supabase-js');
+const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 
-// import express from "express";
-// import bodyParser from "body-parser";
-// import dotenv from "dotenv";
-// import { createClient } from '@supabase/supabase-js';
-// import cors from "cors";
-// import OpenAI from "openai";
 
-// dotenv.config();  
-// const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
-// const supabaseKey = process.env.SUPABASE_ANON_KEY;
-// const supabase = createClient(supabaseUrl, supabaseKey);
-// const openai = new OpenAI({
-//     apiKey: process.env.OPENAI_API_KEY,
-// });
-
-// const app = express();
-// const PORT = process.env.PORT || 3000;
-
-// app.use(bodyParser.json());
-// app.use(cors());
+module.exports = thisRoute;

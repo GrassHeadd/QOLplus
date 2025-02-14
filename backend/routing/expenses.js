@@ -20,4 +20,4 @@ thisRoute.get("/:userId/:monthYear", async (request, response) => {
 }
 });
 
-//todo: get
+module.exports = thisRoute;
