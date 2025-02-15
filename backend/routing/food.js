@@ -8,26 +8,54 @@
 */
 
 
-//post request for the calculation
+import express from "express";
+import bodyParser from "body-parser";
+import dotenv from "dotenv";
+import { createClient } from '@supabase/supabase-js';
+import cors from "cors";
+import OpenAI from "openai";
+
+dotenv.config();  
+const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+app.use(cors());
+
+//get the food in a month
+app.get("/:userId/month/:date", async (request, response) => {
+    try {
+        const userId = request.params.userId;
+        const monthYear = request.params.monthYear;
+
+        const { data } = await supabase.from("food").select("*").eq("userId", userId).lte("startMonthYear", monthYear).gte("endMonthYear", monthyear);
+        response.status(200).json({ data });
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 
-// import express from "express";
-// import bodyParser from "body-parser";
-// import dotenv from "dotenv";
-// import { createClient } from '@supabase/supabase-js';
-// import cors from "cors";
-// import OpenAI from "openai";
+app.get("/:userId/day/:date", async (request, response) => {
+    try {
+        const userId = request.params.userId;
+        const date = request.params.date;
 
-// dotenv.config();  
-// const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
-// const supabaseKey = process.env.SUPABASE_ANON_KEY;
-// const supabase = createClient(supabaseUrl, supabaseKey);
-// const openai = new OpenAI({
-//     apiKey: process.env.OPENAI_API_KEY,
-// });
+        const { data } = await supabase.from("food").select("*").eq("userId", userId).eq("date", date);
+        response.status(200).json({ data });
+    } catch (error) {
+        console.error('Error:', error.message);
+        response.status(500).json({ error: 'Internal server error' });
+    }
+});
 
-// const app = express();
-// const PORT = process.env.PORT || 3000;
 
-// app.use(bodyParser.json());
-// app.use(cors());
+

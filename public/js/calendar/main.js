@@ -11,7 +11,20 @@ document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
   indicateCurrentDay();
 
   addEvent.setupAddEventBtn();
+  // test();
 });
+
+async function test() {
+  try {
+    const date = new Date();
+    const response = await fetch("http://localhost:3000/events/1/week/" + date.getTime());
+    const data = await response.json();
+
+    console.log("Events:", data);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 function loadInitialMonths(plusMinusAmt) {
   /* =================[ vv Variable Setup vv ]================= */

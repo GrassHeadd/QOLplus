@@ -21,7 +21,7 @@ app.use(cors());
 app.use("/events", events);
 app.use("/gym", gym);
 // app.use("/food", food);
-app.use("/expenses", expenses);
+// app.use("/expenses", expenses);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
