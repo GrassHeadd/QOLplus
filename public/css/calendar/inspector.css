@@ -340,12 +340,47 @@
 
 #main .inspector .itinerary .item {
   width: 80%;
+  position: relative;
   display: flex;
   flex-shrink: 0;
   border-radius: 1.3em;
   overflow: hidden;
   /* overflow: hidden; */
   transition: 0.15s ease-in-out;
+}
+
+#main .inspector .itinerary .item .moreBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 18px;
+}
+
+#main .inspector .itinerary .item .moreBtnPopup {
+  position: absolute;
+  top: 3px;
+  right: 8px;
+  font-size: 18px;
+  background-color: #4d5055;
+  border-radius: 0.5em;
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner .moreOptionBtn {
+  margin: 5px;
+  cursor: pointer;
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn {
+  margin: 5px;
+  color: rgb(236, 55, 55);
 }
 
 #main .inspector .itinerary .item:hover {

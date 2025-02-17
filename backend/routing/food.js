@@ -58,4 +58,4 @@ app.get("/:userId/day/:date", async (request, response) => {
 });
 
 
-
+module.exports = thisRoute;

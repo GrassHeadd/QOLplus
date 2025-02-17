@@ -1,4 +1,5 @@
 const thisRoute = require("express").Router();
+const DateUtils = require("../utils/dateUtils.js");
 
 const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
@@ -11,18 +12,13 @@ thisRoute.get("/:userId/month/:date", async (request, response) => {
     try {
         const userId = request.params.userId;
         const inputDate = request.params.date;
-        const fromDate = new Date(inputDate), endDate = new Date(inputDate);
-        fromDate.setDate(1);
-        endDate.setMonth(endDate.getMonth() + 1);
-        endDate.setDate(0);
-        const fromDateStr = fromDate.getFullYear() + "-" + (fromDate.getMonth() + 1) + "-" + (fromDate.getDate());
-        const endDateStr = endDate.getFullYear() + "-" + (endDate.getMonth() + 1) + "-" + (endDate.getDate());
-        console.log(fromDateStr);
-        console.log(endDateStr);
+        const fromDateStr = DateUtils.getDateAtMonthStart(inputDate);
+        const endDateStr = DateUtils.getDateAtMonthEnd(inputDate);
 
-        const { data:data } = await supabase.from("events").select("*").eq("userId", userId).gte("startDate", fromDateStr).lte("startDate", endDateStr).or();
+        const { data:data } = await supabase.from("events").select("*").eq("userId", userId).gte("startDate", fromDateStr).lte("startDate", endDateStr);
         const { data:data2 } = await supabase.from("events").select("*").eq("userId", userId).gte("endDate", fromDateStr).lte("endDate", endDateStr);
         const { data:data3 } = await supabase.from("events").select("*").eq("userId", userId).lte("startDate", fromDateStr).gte("endDate", endDateStr);
+        console.log(data);
         response.status(200).json({ data, data2, data3 });
     } catch (error) {
         console.error('Error:', error.message);
@@ -34,10 +30,8 @@ thisRoute.get("/:userId/week/:date", async (request, response) => {
     try {
         const userId = request.params.userId;
         const inputDate = request.params.date;
-        console.log("Input from frontend: " + inputDate);
-        const fromDate = getStartOfWeekFromDate(new Date(inputDate).toDateString());
-        const toDate = getEndOfWeekFromDate(new Date(inputDate).toDateString());
-        console.log("Start Date: " + fromDate, "End Date: " + toDate);
+        const fromDate = DateUtils.getStartOfWeek(new Date(inputDate).toDateString());
+        const toDate = DateUtils.getEndOfWeek(new Date(inputDate).toDateString());
 
         // Event starts within range and ends within range - eventEnd >= from && eventEnd <= to
         // Event starts within range and ends within after range - eventEnd >= from && eventEnd >= to
@@ -83,42 +77,6 @@ thisRoute.get("/:userId/:eventId", async (request, response) => {
         response.status(500).json({ error: 'Internal server error' });
     }
 });
-
-function getStartOfWeekFromDate(dateStr) {
-    let StartWeekDate = Date.parse(dateStr);
-    while(getDayFromDate(StartWeekDate) > 0) {
-        StartWeekDate.addDays(-1);
-    }
-
-    let year = StartWeekDate.getFullYear();
-    let month = StartWeekDate.getMonth()+1;
-    let day = StartWeekDate.getDate()+1;    
-    console.log("start date: " + year + "-" + month + "-" + day);
-    console.log("done looping start week date");
-    return year + "-" + month + "-" + day;      
-}
-
-function getEndOfWeekFromDate(dateStr) {
-    let EndWeekDate = Date.parse(dateStr);
-    while(getDayFromDate(EndWeekDate) < 6) {
-        EndWeekDate.addDays(1);
-    }
-    let year = EndWeekDate.getFullYear();
-    let month = EndWeekDate.getMonth()+1;
-    let day = EndWeekDate.getDate()+1;  
-    console.log("start date: " + year + "-" + month + "-" + day);
-    console.log("done looping end week date");
-    return year + "-" + month + "-" + day;   
-}
-
-function getDayFromDate(dateStr) {
-    return Date.parse(dateStr).getDay(); //return 0-6
-}
-
-// function getMonthFromDate(dateStr) {
-//     const Month = Date.parse(dateStr).getMonthFromDate();
-//     return Month;
-// }
 
 // Date format: YYYY-MM-DD, Time Format: HH:MM[:SS:MS] (no need for leading 0s)
 // new Date().toLocaleDateString() --> '2/15/2025 (mm/dd/yyyy)'
@@ -183,8 +141,9 @@ thisRoute.delete("/:eventId", async (request, response) => {
 
     try {
         
-        const { data, error } = await supabase.from("events").delete().eq("eventId", eventId);
-        data ? response.json({ data }) : response.status(404).json(error);
+        const { data } = await supabase.from("expenses").delete().eq("expenseId", expenseId);
+        console.log(data);
+        response.status(200).json({ data });
 
     } catch (error) {
         console.error('Error:', error.message);
@@ -206,7 +165,7 @@ thisRoute.put("/:eventId", async (request, response) => {
             endDayOfMonth, 
             startTime, 
             endTime 
-    } = request.body;
+        } = request.body;
        
     try {
         const { data } = await supabase.from("events").update({

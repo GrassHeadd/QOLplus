@@ -1,3 +1,6 @@
+import * as DateUtils from "../utils/date.js";
+import * as ColorUtils from "../utils/color.js";
+
 export function loadInitialMonths(plusMinusAmt) {
     /* =================[ vv Variable Setup vv ]================= */
     // No arguments in Date constructor = today's date
@@ -79,16 +82,13 @@ export function indicateCurrentDay() {
 }
 
 // Handles event fetching from backend & frontend displaying of events
-/**
- * Load 
- * 
- */
 export async function loadEvents() {
     try {
         const userId = 1;
-        const monthyear = 202501;
-        const response = await fetch("http://localhost:3000/events/" + userId + "/" + monthyear);
-        // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
+        const todayDateObj = new Date();
+        const dateStr = DateUtils.getDateStrForBackend(todayDateObj);
+        const response = await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr);
+        // Live Backend Link: https://qo-lplus.vercel.app/events/...
         const data = await response.json();
 
         console.log("Events:", data.data);
@@ -102,7 +102,8 @@ export async function loadEvents() {
             DateUtils.getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
 
         events.forEach(event => {
-            const title = event.title,
+            const eventId = event.eventId,
+                title = event.title,
                 category = event.category,
                 startDOM = event.start_dayofmonth,
                 endDOM = event.end_dayofmonth,
@@ -129,6 +130,12 @@ export async function loadEvents() {
                 `    <div class="title"> ${title}</div>` +
                 `    <div class="info">${notes}</div>` +
                 '  </div>' +
+                '  <span class="moreBtn material-symbols-outlined">more_vert</span>' +
+                '  <div class="moreBtnPopup">' +
+                '    <div class="inner">' +
+                '      <div class="moreOptionBtn deleteBtn material-symbols-outlined">delete</div>' +
+                '    </div>' +
+                '  </div>' +
                 '</div>';
 
             document.getElementById("main").getElementsByClassName("inspector")[0]
@@ -138,8 +145,9 @@ export async function loadEvents() {
                 .getElementsByClassName("inspector")[0]
                 .getElementsByClassName("itinerary")[0]
                 .getElementsByClassName("item"),
-                eventItenElem = allItinElems[allItinElems.length - 1];
-            eventItenElem.getElementsByClassName("left")[0]
+                eventItinElem = allItinElems[allItinElems.length - 1];
+
+            eventItinElem.getElementsByClassName("left")[0]
                 .style.backgroundColor = colourStr;
 
             var startDate = DateUtils.getDateFromFormatted(startDOM, startMY),
@@ -177,8 +185,13 @@ export async function loadEvents() {
                 fullRowCounter++;
             }
 
-            eventItinElems.push(eventItenElem);
+            eventItinElems.push(eventItinElem);
             eventRowElems.push(rowElems);
+
+            // Register event delete button once all cards and ribbons are created (so it can grab them to delete too)
+            eventItemElem.querySelector(".deleteBtn").addEventListener("click", (event) => {
+                deleteEvent(eventId, eventItinElem, rowElems);
+            });
         });
 
         // Hover-active state linking between itninerary cards and calendar ribbons
@@ -221,6 +234,29 @@ export async function loadEvents() {
     } catch (error) {
         console.error('Error:', error.message);
     }
+}
+
+async function deleteEvent(eventId, eventItem, eventRibbons) {
+    try {
+        const response = await fetch("http://localhost:3000/events/" + eventId, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+        });
+        const data = await response.json();
+        eventItem.remove();
+        eventRibbons.forEach(eventRibbon => {
+            eventRibbon.remove();
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function spawnEventItinCard() {
+
 }
 
 // Creates an Event Ribbon at the given HTML Element of the specific day

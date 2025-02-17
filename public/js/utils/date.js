@@ -69,3 +69,8 @@ export function getDateFromInputFieldFormat(input) {
 
     return new Date(yyyy, mm - 1, dd, hr, min, 0);
 }
+
+// YYYY-MM-DD
+export function getDateStrForBackend(dateObj) {
+    return dateObj.getFullYear() + "-" + (dateObj.getMonth() + 1) + "-" + dateObj.getDate();
+}

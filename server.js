@@ -8,8 +8,8 @@ dotenv.config();
 
 // Individual sub-files
 const events = require("./backend/routing/events.js");
-const gym = require("./backend/routing/gym.js");
-const food = require("./backend/routing/food.js");
+const exercises = require("./backend/routing/exercises.js");
+// const food = require("./backend/routing/food.js");
 const expenses = require("./backend/routing/expenses.js");
 
 const app = express();
@@ -19,8 +19,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/events", events);
-app.use("/gym", gym);
-app.use("/food", food);
+app.use("/exercises", exercises);
+// app.use("/food", food);
 app.use("/expenses", expenses);
 
 app.listen(PORT, () => {

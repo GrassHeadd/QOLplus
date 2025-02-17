@@ -10,35 +10,52 @@ linkage with other stuff
 */
 
 const thisRoute = require("express").Router();
+const DateUtils = require("../utils/dateUtils.js");
 
 const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+require('datejs');
 
+thisRoute.get("/:userId/:month/:date", async (request, response) => {
+    try {
+      const userId = request.params.userId;
+      const inputDate = request.params.date;
+      const fromDateStr = DateUtils.getDateAtMonthStart(inputDate);
+      const endDateStr = DateUtils.getDateAtMonthEnd(inputDate);
+  
+      const { data } = await supabase.from("exercises").select("*").eq("userId", userId).gte("date", fromDateStr).lte("date", endDateStr)
+      response.status(200).json({ data });
+      
+  } catch (error) {
+      console.error('Error:', error.message);
+      response.status(500).json({ error: 'Internal server error' });
+  }
+  });
 
-//get gym data for a user for a specific monthyear
-// thisRoute.get("/:userId/:monthYear", async (request, response) => {
-//     try {
-//         const userId = request.params.userId;
-//         const monthYear = request.params.monthYear;
-
-//         const { data } = await supabase.from("gym").select("*").eq("userId", userId).lte("startMonthYear", monthYear).gte("endMonthYear", monthYear);
-
-//         response.json({ data });
-        
-//     } catch (error) {
-//         console.error('Error:', error.message);
-//         response.status(500).json({ error: 'Internal server error' });
-//     }
-// });
+thisRoute.get("/:userId/:week/:date", async (request, response) => {
+    try {
+      const userId = request.params.userId;
+      const inputDate = request.params.date;
+      const fromDateStr = DateUtils.getEndOfWeek(inputDate);
+      const endDateStr = DateUtils.getStartOfWeek(inputDate);
+  
+      const { data } = await supabase.from("exercises").select("*").eq("userId", userId).gte("date", fromDateStr).lte("date", endDateStr)
+      response.status(200).json({ data });
+      
+  } catch (error) {
+      console.error('Error:', error.message);
+      response.status(500).json({ error: 'Internal server error' });
+  }
+  });
 
 //get all gym data for a user
 thisRoute.get("/:userId", async (request, response) => {
     try {
         const userId = request.params.userId;
 
-        const { data } = await supabase.from("gym").select("*").eq("userId", userId);
+        const { data } = await supabase.from("exercises").select("*").eq("userId", userId);
 
         response.json({ data });
 
@@ -54,7 +71,7 @@ thisRoute.get("/:userId/:exerciseId", async (request, response) => {
         const userId = request.params.userId;
         const exerciseId = request.params.exerciseId;
 
-        const { data } = await supabase.from("gym").select("*").eq("userId", userId).eq("exerciseId", exerciseId);
+        const { data } = await supabase.from("exercises").select("*").eq("userId", userId).eq("exerciseId", exerciseId);
 
         response.json({ data });
 
@@ -68,18 +85,22 @@ thisRoute.get("/:userId/:exerciseId", async (request, response) => {
 
 //post gym data
 thisRoute.post("/", async (request, response) => {
-    const { userId, exerciseName, exerciseStructure, exerciseDate } = request.body;
+    const { userId, 
+        exerciseName, 
+        exerciseStructure, 
+        date 
+        } = request.body;
 
     try {
-    const { data } = await supabase.from("gym").insert({
+    const { data } = await supabase.from("exercises").insert({
         userId: userId,
         exerciseName: exerciseName,
         exerciseStructure: exerciseStructure,
-        exerciseDate: exerciseDate
+        date: date
         //no need exerciseId, supabase will auto generate
     });
 
-    response.json({ data });
+    response.status(200).json({ data });
 
     } catch (error) {
     console.error('Error:', error.message);
@@ -92,9 +113,8 @@ thisRoute.delete("/:exerciseId", async (request, response) => {
     const exerciseId = request.params.exerciseId;
 
     try {
-
-        const { data, error } = await supabase.from("gym").delete().eq("exerciseId", exerciseId);
-        data ? response.json({ data }) : response.status(404).json(error);
+        const { data } = await supabase.from("exercises").delete().eq("exerciseId", exerciseId);
+        response.status(200).json({ data });
 
     } catch (error) {
         console.error('Error:', error.message);
@@ -104,23 +124,32 @@ thisRoute.delete("/:exerciseId", async (request, response) => {
 
 //edit a event
 thisRoute.put("/:exerciseId", async (request, response) => {
-    const { userId, exerciseName, exerciseStructure, exerciseDate } = request.body;
+    const { userId, 
+            exerciseName, 
+            exerciseStructure, 
+            date
+        } = request.body;
+    
+    const exerciseId = request.params.exerciseId;
        
     try {
-        const { data } = await supabase.from("gym").insert({
+        const { data } = await supabase.from("exercises").update({
             userId: userId,
             exerciseName: exerciseName,
             exerciseStructure: exerciseStructure,
-            exerciseDate: exerciseDate
-        });
+            date: date
+        }).eq("exerciseId", exerciseId).select("*");
 
-        response.status(200).json(data);
+        if (!data || data.length === 0) {
+            return response.status(404).json({ error: "exercise not found" });
+          } else {
+            return response.status(200).json({ data });
+          }
 
     } catch (error) {
         console.error('Error:', error.message);
         response.status(500).json({ error: 'Internal server error' });
     }
 });
-
 
 module.exports = thisRoute;
