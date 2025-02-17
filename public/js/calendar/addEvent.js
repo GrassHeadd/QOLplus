@@ -68,7 +68,14 @@ export function setupAddEventBtn() {
                     endTime: endTime
                 })
             });
-            const data = await response.json();
+            const data = await response.json().then(() => {
+                // to create event ribbons and all that
+                
+                // to clear input fields
+                // to close event
+            }).catch(error => {
+                // show user popup error
+            });
             console.log("Response", data);
 
             // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);

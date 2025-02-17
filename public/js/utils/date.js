@@ -8,10 +8,15 @@ export function getNextSundayDelta(date) {
 /**
  * TODO Add JSDocs
  */
-// Get Date Object given DOM and MY
-export function getDateFromFormatted(dom, my) {
-    return new Date(parseInt((my + "").slice(0, 4)),
-        parseInt((my + "").slice(4, 6)) - 1, dom);
+// Get Date Object given date and time
+export function getDateFromFormatted(dateStr, timeStr) {
+    const dateObj = new Date(dateStr);
+    if (timeStr != null && timeStr) {
+        const subTime = timeStr.split(":");
+        date.setHours(parseInt(subTime[0]));
+        date.setMinutes(parseInt(subTime[1]));
+    }
+    return dateObj;
 }
 
 /**

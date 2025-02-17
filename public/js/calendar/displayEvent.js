@@ -105,12 +105,10 @@ export async function loadEvents() {
             const eventId = event.eventId,
                 title = event.title,
                 category = event.category,
-                startDOM = event.start_dayofmonth,
-                endDOM = event.end_dayofmonth,
-                startTime = event.start_time,
-                endTime = event.end_time,
-                startMY = event.start_monthyear,
-                endMY = event.end_monthyear,
+                startDate = event.startDate,
+                endDate = event.endDate,
+                startTime = event.startTime,
+                endTime = event.endTime,
                 location = event.location,
                 notes = event.notes;
 
@@ -150,16 +148,16 @@ export async function loadEvents() {
             eventItinElem.getElementsByClassName("left")[0]
                 .style.backgroundColor = colourStr;
 
-            var startDate = DateUtils.getDateFromFormatted(startDOM, startMY),
-                endDate = DateUtils.getDateFromFormatted(endDOM, endMY);
-            var dayCount = DateUtils.getDayNumBetween(startDate, endDate);
+            var startDateObj = DateUtils.getDateFromFormatted(startDate, startTime),
+                endDateObj = DateUtils.getDateFromFormatted(endDate, endTime);
+            var dayCount = DateUtils.getDayNumBetween(startDateObj, endDateObj);
 
             const parentDayElem = document.getElementById("main")
                 .getElementsByClassName("calendar")[0]
                 .getElementsByClassName("bottom")[0]
-                .getElementsByClassName(startDate.toDateString()
+                .getElementsByClassName(startDateObj.toDateString()
                     .replaceAll(" ", ""))[0];
-            var curDate = new Date(startDate.getTime());
+            var curDate = new Date(startDateObj.getTime());
             var nextSundayDelta = DateUtils.getNextSundayDelta(curDate);
 
             /* 4. Generate the first row's ribbon  */
@@ -172,7 +170,7 @@ export async function loadEvents() {
             var fullRowCounter = 0;
             while (dayCount > 0) {
                 var curRowLength = Math.min(7, dayCount);
-                var mondayDate = new Date(startDate.getTime());
+                var mondayDate = new Date(startDateObj.getTime());
                 mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
                 const mondayElem = document.getElementById("main")
                     .getElementsByClassName("calendar")[0]
@@ -189,7 +187,7 @@ export async function loadEvents() {
             eventRowElems.push(rowElems);
 
             // Register event delete button once all cards and ribbons are created (so it can grab them to delete too)
-            eventItemElem.querySelector(".deleteBtn").addEventListener("click", (event) => {
+            eventItinElem.querySelector(".deleteBtn").addEventListener("click", (event) => {
                 deleteEvent(eventId, eventItinElem, rowElems);
             });
         });
@@ -236,23 +234,27 @@ export async function loadEvents() {
     }
 }
 
-async function deleteEvent(eventId, eventItem, eventRibbons) {
-    try {
-        const response = await fetch("http://localhost:3000/events/" + eventId, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-        });
-        const data = await response.json();
-        eventItem.remove();
+function deleteEvent(eventId, eventItinElem, eventRibbons) {
+    tryDeleteEvent(eventId).then(data => {
+        eventItinElem.remove();
         eventRibbons.forEach(eventRibbon => {
             eventRibbon.remove();
         });
-    } catch (error) {
+    }).catch(error => {
+        console.log("Error when sending DELETE request to backend, not continuing for frontend:");
         console.log(error);
-    }
+    })
+}
+
+async function tryDeleteEvent(eventId) {
+    const response = await fetch("http://localhost:3000/events/" + eventId, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+    });
+    return await response.json();
 }
 
 function spawnEventItinCard() {

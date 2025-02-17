@@ -110,7 +110,7 @@ function jsDateToPostgresTime(dateStr) {
 
 //post a event
 thisRoute.post("/", async (request, response) => {
-    const { userId, title, location, notes, category, startMonthYear, endMonthYear, startDOM, endDOM, startTime, endTime } = request.body;
+    const { userId, title, location, notes, category, startDate, endDate, startTime, endTime } = request.body;
   
     try {
         const { data } = await supabase.from("events").insert({
@@ -119,10 +119,8 @@ thisRoute.post("/", async (request, response) => {
             location: location,
             notes: notes,
             category: category,
-            startMonthyear: startMonthYear,
-            endMonthyear: endMonthYear,
-            startDayofmonth: startDOM,
-            endDayofmonth: endDOM,
+            startDate: startDate,
+            endDate: endDate,
             startTime: startTime,
             endTime: endTime
     });
@@ -141,7 +139,7 @@ thisRoute.delete("/:eventId", async (request, response) => {
 
     try {
         
-        const { data } = await supabase.from("expenses").delete().eq("expenseId", expenseId);
+        const { data } = await supabase.from("events").delete().eq("eventId", eventId);
         console.log(data);
         response.status(200).json({ data });
 
