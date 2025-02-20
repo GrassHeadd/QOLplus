@@ -107,9 +107,9 @@ function jsDateToPostgresTime(dateStr) {
 //   }
 // });
 
-
 //post a event
 thisRoute.post("/", async (request, response) => {
+    const { userId, title, location, notes, category, startDate, endDate, startTime, endTime } = request.body;
     const { userId, title, location, notes, category, startDate, endDate, startTime, endTime } = request.body;
   
     try {

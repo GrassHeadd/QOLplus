@@ -88,7 +88,8 @@ thisRoute.post("/", async (request, response) => {
     const { userId, 
         exerciseName, 
         exerciseStructure, 
-        date 
+        date,
+        notes 
         } = request.body;
 
     try {
@@ -96,7 +97,8 @@ thisRoute.post("/", async (request, response) => {
         userId: userId,
         exerciseName: exerciseName,
         exerciseStructure: exerciseStructure,
-        date: date
+        date: date,
+        notes: notes
         //no need exerciseId, supabase will auto generate
     });
 
@@ -127,7 +129,8 @@ thisRoute.put("/:exerciseId", async (request, response) => {
     const { userId, 
             exerciseName, 
             exerciseStructure, 
-            date
+            date,
+            notes
         } = request.body;
     
     const exerciseId = request.params.exerciseId;
@@ -137,7 +140,8 @@ thisRoute.put("/:exerciseId", async (request, response) => {
             userId: userId,
             exerciseName: exerciseName,
             exerciseStructure: exerciseStructure,
-            date: date
+            date: date,
+            notes: notes
         }).eq("exerciseId", exerciseId).select("*");
 
         if (!data || data.length === 0) {

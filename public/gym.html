@@ -1,11 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gym</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/gym/gym.css" />
+    <link rel="stylesheet" href="./css/gym/global.css" />
+
+    <!-- JS Scripts -->
+    <script src="./js/utils/color.js" type="module"></script>
+    <script src="./js/utils/date.js" type="module"></script>
+    <script src="./js/gym/main.js" type="module"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
+  </head>
+
+  <body>
+    <header>
+      <h1 class="title">Gym</h1>
+      <p class="welcomeTitle">
+        Here you can find all the information about the gym
+      </p>
+      <a href="calendar.html" class="linkBack">Back to home</a>
+    </header>
+
+    <main>
+      <!-- Upcoming Section -->
+      <section id="upcoming-workout" class="workout-section">
+        <h2 class="section-title">Upcoming Exercises</h2>
+        <div class="upcoming">
+          <table class="table">
+            <tr class="header">
+              <th>Date</th>
+              <th>Exercise Name</th>
+              <th>Details</th>
+              <th>Notes</th>
+            </tr>
+            <tr class="logs">
+              <!-- <td>2025-10-01</td>
+              <td>Back Day</td>
+              <td>
+                set 1: 10<br />
+                set 2: 12<br />
+                set 3: 15<br />
+                set 4: 12<br />
+                set 5: 10
+              </td>
+              <td>Bring Towel &amp; Sports Attire.</td> -->
+              <tr class="default">
+                <td colspan="4">You have no plans yet, loser.</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <!-- Past Section -->
+      <section id="past-workout" class="workout-section">
+        <h2 class="section-title">Past Exercises</h2>
+        <div class="past">
+          <table class="table">
+            <tr class="header">
+              <th>Date</th>
+              <th>Exercise Name</th>
+              <th>Details</th>
+              <th>Notes</th>
+            </tr>
+            <tr class="logs">
+              <!-- <td>2025-10-01</td>
+              <td>Back Day</td>
+              <td>
+                set 1: 10<br />
+                set 2: 12<br />
+                set 3: 15<br />
+                set 4: 12<br />
+                set 5: 10
+              </td>
+              <td>Bring Towel &amp; Sports Attire.</td> -->
+              <tr class="default">
+                <td colspan="4">You have not done any exercises yet, loser.</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+    </main>
+  </body>
 </html>

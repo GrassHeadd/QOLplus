@@ -255,25 +255,9 @@
   margin-left: 2px;
 }
 
-#main .inspector .filters .itinSummary .item.gym .marker {
-  background-color: #7ebd8b;
-}
-
-#main .inspector .filters .itinSummary .item.gym .label {
-  color: #7ebd8b;
-}
-
 #main .inspector .filters .itinSummary .item:hover {
   background-color: rgb(111, 111, 111);
   border-color: rgb(111, 111, 111);
-}
-
-#main .inspector .filters .itinSummary .item.school .marker {
-  background-color: #e1b8be;
-}
-
-#main .inspector .filters .itinSummary .item.school .label {
-  color: #e1b8be;
 }
 
 #main .inspector .filters .right .addEventPopup {

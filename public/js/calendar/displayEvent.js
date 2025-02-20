@@ -1,5 +1,6 @@
 import * as DateUtils from "../utils/date.js";
 import * as ColorUtils from "../utils/color.js";
+import * as ItinSummary from "./itinSummary.js";
 
 export function loadInitialMonths(plusMinusAmt) {
     /* =================[ vv Variable Setup vv ]================= */
@@ -57,7 +58,6 @@ export function loadInitialMonths(plusMinusAmt) {
 }
 
 export function loadOtherMonths() {
-
 }
 
 export function indicateCurrentDay() {
@@ -81,183 +81,191 @@ export function indicateCurrentDay() {
     // }
 }
 
+const catColors = {};
+
 // Handles event fetching from backend & frontend displaying of events
 export async function loadEvents() {
+    document.querySelectorAll("#main .inspector .itinerary .item").forEach(item => item.remove());
+    document.querySelectorAll("#main .calendar .bottom .day .eventRibbon").forEach(item => item.remove());
+    document.querySelectorAll("#itinSummary .item").forEach(item => item.remove());
+
     try {
         const userId = 1;
         const todayDateObj = new Date();
         const dateStr = DateUtils.getDateStrForBackend(todayDateObj);
         const response = await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr);
         // Live Backend Link: https://qo-lplus.vercel.app/events/...
-        const data = await response.json();
 
-        console.log("Events:", data.data);
+        await response.json().then(data => {
+            console.log("Events:", data.data);
+            var eventItinElems = [], eventRowElems = [];
+    
+            const events = data.data;
 
-        const events = data.data, eventColours = [];
-        var eventItinElems = [], eventRowElems = [];
-
-        /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
-        events.sort((event1, event2) =>
-            DateUtils.getDateFromFormatted(event1.start_dayofmonth, event1.start_monthyear).getTime() -
-            DateUtils.getDateFromFormatted(event2.start_dayofmonth, event2.start_monthyear).getTime());
-
-        events.forEach(event => {
-            const eventId = event.eventId,
-                title = event.title,
-                category = event.category,
-                startDate = event.startDate,
-                endDate = event.endDate,
-                startTime = event.startTime,
-                endTime = event.endTime,
-                location = event.location,
-                notes = event.notes;
-
-            var rowElems = [];
-
-            /* 2 Generate a random colour for each event */
-            const colourStr = ColorUtils.getRandomColorStr(eventColours);
-            eventColours.push(colourStr);
-
-            /* 3. Generate Itinerary item */
-            const eventElement =
-                `<div class="item ${category}">` +
-                '  <div class="left">' +
-                `    <div class="period"> ${startTime}hr<br>-<br>${endTime}hr</div>` +
-                '  </div>' +
-                '  <div class="right">' +
-                `    <div class="title"> ${title}</div>` +
-                `    <div class="info">${notes}</div>` +
-                '  </div>' +
-                '  <span class="moreBtn material-symbols-outlined">more_vert</span>' +
-                '  <div class="moreBtnPopup">' +
-                '    <div class="inner">' +
-                '      <div class="moreOptionBtn deleteBtn material-symbols-outlined">delete</div>' +
-                '    </div>' +
-                '  </div>' +
-                '</div>';
-
-            document.getElementById("main").getElementsByClassName("inspector")[0]
-                .getElementsByClassName("itinerary")[0]
-                .insertAdjacentHTML("beforeend", eventElement);
-            const allItinElems = document.getElementById("main")
-                .getElementsByClassName("inspector")[0]
-                .getElementsByClassName("itinerary")[0]
-                .getElementsByClassName("item"),
-                eventItinElem = allItinElems[allItinElems.length - 1];
-
-            eventItinElem.getElementsByClassName("left")[0]
-                .style.backgroundColor = colourStr;
-
-            var startDateObj = DateUtils.getDateFromFormatted(startDate, startTime),
-                endDateObj = DateUtils.getDateFromFormatted(endDate, endTime);
-            var dayCount = DateUtils.getDayNumBetween(startDateObj, endDateObj);
-
-            const parentDayElem = document.getElementById("main")
-                .getElementsByClassName("calendar")[0]
-                .getElementsByClassName("bottom")[0]
-                .getElementsByClassName(startDateObj.toDateString()
-                    .replaceAll(" ", ""))[0];
-            var curDate = new Date(startDateObj.getTime());
-            var nextSundayDelta = DateUtils.getNextSundayDelta(curDate);
-
-            /* 4. Generate the first row's ribbon  */
-            const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
-            dayCount -= firstRowLength;
-            const firstRowElem = spawnEventRibbon(parentDayElem, event, firstRowLength, colourStr, true, dayCount == 0);
-            rowElems.push(firstRowElem);
-
-            /* 5. Generate all subsequent row's ribbons */
-            var fullRowCounter = 0;
-            while (dayCount > 0) {
-                var curRowLength = Math.min(7, dayCount);
-                var mondayDate = new Date(startDateObj.getTime());
-                mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
-                const mondayElem = document.getElementById("main")
-                    .getElementsByClassName("calendar")[0]
-                    .getElementsByClassName("bottom")[0]
-                    .getElementsByClassName(mondayDate.toDateString()
-                        .replaceAll(" ", ""))[0];
-                dayCount -= curRowLength;
-                const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colourStr, false, dayCount == 0);
-                rowElems.push(curRowRibbon);
-                fullRowCounter++;
-            }
-
-            eventItinElems.push(eventItinElem);
-            eventRowElems.push(rowElems);
-
-            // Register event delete button once all cards and ribbons are created (so it can grab them to delete too)
-            eventItinElem.querySelector(".deleteBtn").addEventListener("click", (event) => {
-                deleteEvent(eventId, eventItinElem, rowElems);
+            /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
+            events.sort((event1, event2) => {
+                const date1 = new Date(event1.startTime.substring(0, 2) + ":" + event1.startTime(3, 4) + " " + event1.startDate);
+                const date2 = new Date(event2.startTime.substring(0, 2) + ":" + event2.startTime(3, 4) + " " + event2.startDate);
+                return date1.getTime() - date2.getTime();
             });
-        });
-
-        // Hover-active state linking between itninerary cards and calendar ribbons
-        eventItinElems.forEach((itinElem, index) => {
-
-            itinElem.addEventListener("mouseenter", event => {
-                eventRowElems[index].forEach(rowElem => {
-                    if (!rowElem.classList.contains("active"))
-                        rowElem.classList.add("active");
+    
+            /* 2. Generate the color for each category */
+            events.forEach(event => {
+                if (catColors[event.category] == undefined) {
+                    catColors[event.category] = ColorUtils.getRandomColorStr(catColors);
+                }
+            });
+    
+            /* 3. Generate the Itinerary Summary */
+            ItinSummary.spawnEventItinCategory(events, catColors);
+    
+            events.forEach(event => {
+                const eventId = event.eventId,
+                    title = event.title,
+                    category = event.category,
+                    startDateStr = event.startDate,
+                    endDateStr = event.endDate,
+                    startTime = events.startTime,
+                    endTime = event.endTime,
+                    location = event.location,
+                    notes = event.notes;
+    
+                var rowElems = [];
+    
+                const colorStr = catColors[category];
+    
+                /* 3. Generate Itinerary card item */
+                const eventElement =
+                    `<div class="item ${category}">` +
+                    '  <div class="left">' +
+                    `    <div class="period"> ${startDate}hr<br>-<br>${endTime}hr</div>` +
+                    '  </div>' +
+                    '  <div class="right">' +
+                    `    <div class="title"> ${title}</div>` +
+                    `    <div class="info">${notes}</div>` +
+                    '  </div>' +
+                    '  <span class="moreBtn material-symbols-outlined">more_vert</span>' +
+                    '  <div class="moreBtnPopup">' +
+                    '    <div class="inner">' +
+                    '      <div class="moreOptionBtn deleteBtn material-symbols-outlined">delete</div>' +
+                    '    </div>' +
+                    '  </div>' +
+                    '</div>';
+    
+                document.querySelector("#main .inspector .itinerary").insertAdjacentHTML("beforeend", eventElement);
+                const allItinElems = document.querySelector("#main .inspector .itinerary").getElementsByClassName("item"),
+                    eventItinElem = allItinElems[allItinElems.length - 1];
+    
+    
+                eventItinElem.getElementsByClassName("left")[0].style.backgroundColor = colorStr;
+    
+                var startDate = new Date(startDateStr), endDate = new Date(endDateStr);
+                var dayCount = DateUtils.getDayNumBetween(startDate, endDate);
+    
+                const parentDayElem = document.querySelector("#main .calendar .bottom .dayDisplay .day." + startDate.toDateString().replaceAll(" ", ""));
+                var curDate = new Date(startDate.getTime());
+                var nextSundayDelta = DateUtils.getNextSundayDelta(curDate);
+    
+                /* 4. Generate the first row's ribbon  */
+                const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
+                dayCount -= firstRowLength;
+                const firstRowElem = spawnEventRibbon(parentDayElem, event, firstRowLength, colorStr, true, dayCount == 0);
+                rowElems.push(firstRowElem);
+    
+                /* 5. Generate all subsequent row's ribbons */
+                var fullRowCounter = 0;
+                while (dayCount > 0) {
+                    var curRowLength = Math.min(7, dayCount);
+                    var mondayDate = new Date(startDate.getTime());
+                    mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
+                    const mondayElem = document.querySelector("#main .calendar .bottom .day." + mondayDate.toDateString().replaceAll(" ", ""));
+                    dayCount -= curRowLength;
+                    const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colorStr, false, dayCount == 0);
+                    rowElems.push(curRowRibbon);
+                    fullRowCounter++;
+                }
+    
+                eventItinElems.push(eventItinElem);
+                eventRowElems.push(rowElems);
+    
+                // Register event delete button once all cards and ribbons are created (so it can grab them to delete too)
+                eventItinElem.querySelector(".deleteBtn").addEventListener("click", (event) => {
+                    deleteEvent(eventId, eventItinElem, rowElems);
                 });
             });
-
-            itinElem.addEventListener("mouseleave", event => {
-                eventRowElems[index].forEach(rowElem => {
-                    if (rowElem.classList.contains("active"))
-                        rowElem.classList.remove("active");
-                });
-            });
-        });
-
-        // Each Row Item actives all others when hovered over
-        eventRowElems.forEach(rowGroup => {
-            rowGroup.forEach(rowItem => {
-                rowItem.addEventListener("mouseenter", event => {
-                    rowGroup.forEach(eachRowItem => {
-                        if (!eachRowItem.classList.contains("active"))
-                            eachRowItem.classList.add("active");
+    
+            // Hover-active state linking between itninerary cards and calendar ribbons
+            eventItinElems.forEach((itinElem, index) => {
+    
+                itinElem.addEventListener("mouseenter", event => {
+                    eventRowElems[index].forEach(rowElem => {
+                        if (!rowElem.classList.contains("active"))
+                            rowElem.classList.add("active");
                     });
                 });
-
-                rowItem.addEventListener("mouseleave", event => {
-                    rowGroup.forEach(eachRowItem => {
-                        if (eachRowItem.classList.contains("active"))
-                            eachRowItem.classList.remove("active");
+    
+                itinElem.addEventListener("mouseleave", event => {
+                    eventRowElems[index].forEach(rowElem => {
+                        if (rowElem.classList.contains("active"))
+                            rowElem.classList.remove("active");
+                    });
+                });
+            });
+    
+            // Each Row Item actives all others when hovered over
+            eventRowElems.forEach(rowGroup => {
+                rowGroup.forEach(rowItem => {
+                    rowItem.addEventListener("mouseenter", event => {
+                        rowGroup.forEach(eachRowItem => {
+                            if (!eachRowItem.classList.contains("active"))
+                                eachRowItem.classList.add("active");
+                        });
+                    });
+    
+                    rowItem.addEventListener("mouseleave", event => {
+                        rowGroup.forEach(eachRowItem => {
+                            if (eachRowItem.classList.contains("active"))
+                                eachRowItem.classList.remove("active");
+                        });
                     });
                 });
             });
         });
-
     } catch (error) {
         console.error('Error:', error.message);
     }
 }
 
-function deleteEvent(eventId, eventItinElem, eventRibbons) {
-    tryDeleteEvent(eventId).then(data => {
-        eventItinElem.remove();
-        eventRibbons.forEach(eventRibbon => {
-            eventRibbon.remove();
+export function displayEvent(event) {
+    loadEvents();
+}
+
+async function deleteEvent(eventId, eventItem, eventRibbons) {
+    try {
+        const response = await fetch("http://localhost:3000/events/" + eventId, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
         });
-    }).catch(error => {
-        console.log("Error when sending DELETE request to backend, not continuing for frontend:");
+        console.log("Response:", response);
+        const data = await response.json().then(data => {
+            console.log(data);
+            eventItem.remove();
+            eventRibbons.forEach(eventRibbon => {
+                eventRibbon.remove();
+            });
+        }).catch(error => {
+            console.log("Catching error message");
+            console.error("Error:", error.message);
+        });
+    } catch (error) {
         console.log(error);
-    })
+    }
 }
 
-async function tryDeleteEvent(eventId) {
-    const response = await fetch("http://localhost:3000/events/" + eventId, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        },
-    });
-    return await response.json();
-}
-
-function spawnEventItinCard() {
+function spawnEventItinCard(event) {
 
 }
 
@@ -275,6 +283,7 @@ function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasR
         `</div>`;
 
     dayElem.insertAdjacentHTML('beforeend', eventRibbonElemStr);
+            
     const allDayEvents = dayElem.getElementsByClassName("eventRibbon"),
         eventRibbonElem = allDayEvents[allDayEvents.length - 1];
 

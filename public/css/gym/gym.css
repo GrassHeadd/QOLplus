@@ -1,0 +1,101 @@
+/* ------------------------------
+   Header and Basic Layout
+------------------------------- */
+header {
+  text-align: center;
+  padding: 1.5rem 1rem 0.75rem;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.title {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+  color: rgb(10, 111, 77);
+}
+
+.welcomeTitle {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #555;
+}
+
+.linkBack {
+  display: inline-block;
+  margin-bottom: 1rem;
+  text-decoration: none;
+  color: #0077cc;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.linkBack:hover {
+  text-decoration: none;
+  background-color: #0077cc;
+  color: #ffffff;
+}
+
+/* Main Container */
+main {
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ------------------------------
+   Sections
+------------------------------- */
+.workout-section {
+  margin: 1.5rem 0;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ------------------------------
+   Table Styling
+------------------------------- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead,
+.table .header {
+  background-color: #eaeaea;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.logs {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.logs:hover {
+  background-color: #fdfdfd;
+}
+

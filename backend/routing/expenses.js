@@ -74,7 +74,8 @@ thisRoute.post("/", async (request, response) => {
         expenseName, 
         amount, 
         category, 
-        date
+        date,
+        notes
         } = request.body;
   
     try {
@@ -83,7 +84,8 @@ thisRoute.post("/", async (request, response) => {
             expenseName: expenseName,
             amount: amount,
             category: category,
-            date: date
+            date: date,
+            notes: notes
     });
 
     response.status(200).json({ data });
@@ -115,7 +117,8 @@ thisRoute.put("/:expenseId", async (request, response) => {
             expenseName, 
             amount, 
             category, 
-            date
+            date,
+            notes
         } = request.body;
 
     const expenseId = request.params.expenseId;
@@ -126,7 +129,8 @@ thisRoute.put("/:expenseId", async (request, response) => {
             expenseName: expenseName,
             amount: amount,
             category: category,
-            date: date
+            date: date,
+            notes: notes
     }).eq("expenseId", expenseId).select("*");
 
     if (!data || data.length === 0) {
