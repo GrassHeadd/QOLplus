@@ -33,56 +33,6 @@ export function setupAddEventBtn() {
         const startDate = startDateUnformated.split(" ")[1],
             endDate = endDateUnformated.split(" ")[1];
 
-        const startMonthYear = DateUtils.getYYYYMMFromDateObj(startDateObj),
-            startDOM = startDateObj.getDate(),
-            startTime = parseInt(startDateObj.getHours() + ""
-                + startDateObj.getMinutes() < 10
-                ? "0" + startDateObj.getMinutes()
-                : startDateObj.getMinutes());
-
-
-        const endMonthYear = DateUtils.getYYYYMMFromDateObj(endDateObj),
-            endDOM = endDateObj.getDate(),
-            endTime = parseInt(endDateObj.getHours() + ""
-                + endDateObj.getMinutes() < 10
-                ? "0" + endDateObj.getMinutes()
-                : endDateObj.getMinutes());
-
-        try {
-            const response = await fetch("http://localhost:3000/events/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({
-                    userId: userId,
-                    title: title,
-                    location: location,
-                    notes: notes,
-                    category: category,
-                    startMonthYear: startMonthYear,
-                    endMonthYear: endMonthYear,
-                    startDOM: startDOM,
-                    endDOM: endDOM,
-                    startTime: startTime,
-                    endTime: endTime
-                })
-            });
-            const data = await response.json().then(() => {
-                // to create event ribbons and all that
-                
-                // to clear input fields
-                // to close event
-            }).catch(error => {
-                // show user popup error
-            });
-            console.log("Response", data);
-
-            // const response = await fetch("https://qo-lplus.vercel.app/events/" + userId + "/" + monthyear);
-        } catch (error) {
-            console.log(error);
-        }
         const startTime = startDateUnformated.split(" ")[0],
             endTime = endDateUnformated.split(" ")[0];
 

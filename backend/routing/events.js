@@ -110,43 +110,36 @@ function jsDateToPostgresTime(dateStr) {
 //post a event
 thisRoute.post("/", async (request, response) => {
     const { userId, title, location, notes, category, startDate, endDate, startTime, endTime } = request.body;
-    const { userId, title, location, notes, category, startDate, endDate, startTime, endTime } = request.body;
   
-    try {
-        const { data } = await supabase.from("events").insert({
-            userId: userId,
-            title: title,
-            location: location,
-            notes: notes,
-            category: category,
-            startDate: startDate,
-            endDate: endDate,
-            startTime: startTime,
-            endTime: endTime
+    await supabase.from("events").insert({
+        userId: userId,
+        title: title,
+        location: location,
+        notes: notes,
+        category: category,
+        startDate: startDate,
+        endDate: endDate,
+        startTime: parseInt(startTime),
+        endTime: parseInt(endTime)
+    }).then(queryResponse => {
+        if (queryResponse.error) {
+            response.status(500).json({ error: queryResponse.error.message });
+        } else {
+            response.status(200).json({ message: "Event added successfully" });
+        }
     });
-
-    response.json({ data });
-    
-} catch (error) {
-    console.error('Error:', error.message);
-    response.status(500).json({ error: 'Internal server error' });
-}
 });
 
 //delete a specific event
 thisRoute.delete("/:eventId", async (request, response) => {
     const eventId = request.params.eventId;
-
-    try {
-        
-        const { data } = await supabase.from("events").delete().eq("eventId", eventId);
-        console.log(data);
-        response.status(200).json({ data });
-
-    } catch (error) {
-        console.error('Error:', error.message);
-        response.status(500).json({ error: 'Internal server error, unable to delete' });
-    }
+    await supabase.from("events").delete().eq("eventId", eventId).then(queryResponse => {
+        if (queryResponse.error) {
+            response.status(500).json({ error: queryResponse.error.message });
+        } else {
+            response.status(200).json({ message: "Event deleted successfully" });
+        }
+    });
 });
 
 //edit a event
