@@ -10,7 +10,7 @@ linkage with other stuff
 */
 
 const thisRoute = require("express").Router();
-const DateUtils = require("../utils/dateUtils.js");
+const DateUtils = require("../utils/date.js");
 
 const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = 'https://rmjcnufjtkakbcocvglf.supabase.co';
