@@ -367,10 +367,10 @@
   color: rgb(236, 55, 55);
 }
 
-#main .inspector .itinerary .item:hover {
+#main .inspector .itinerary .item.active, #main .inspector .itinerary .item:hover {
   transform: scale(1.03);
   box-shadow: 0px 5px 10px 3px rgba(255, 255, 255, 0.3);
-  animation: 5s itenShadowColor infinite forwards;
+  animation: 5s itinCardHoverAnim infinite forwards;
 }
 
 #main .inspector .itinerary .item .left {
@@ -421,25 +421,7 @@
   color: rgb(163, 163, 163);
 }
 
-#main .inspector .itinerary .item.gym .left {
-  color: white;
-  background-color: #7ebd8b;
-}
-
-#main .inspector .itinerary .item.gym .right .title {
-  color: #7ebd8b;
-}
-
-#main .inspector .itinerary .item.school .left {
-  color: white;
-  background-color: #e1b8be;
-}
-
-#main .inspector .itinerary .item.school .title {
-  color: #e1b8be;
-}
-
-@keyframes itenShadowColor {
+@keyframes itinCardHoverAnim {
   0% {
     box-shadow: 0px 5px 5px 3px rgba(255, 255, 255, 0.3);
   }

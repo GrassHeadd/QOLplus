@@ -109,11 +109,11 @@ thisRoute.post("/", async (request, response) => {
         endDate: endDate,
         startTime: parseInt(startTime),
         endTime: parseInt(endTime)
-    }).then(queryResponse => {
+    }).select("eventId").then(async (queryResponse) => {
         if (queryResponse.error) {
             response.status(500).json({ "error": queryResponse.error.message });
         } else {
-            response.status(200).json({ "data": "Event added successfully" });
+            response.status(200).json({ "eventId": queryResponse.data[0].eventId });
         }
     });
 });

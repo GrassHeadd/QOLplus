@@ -1,6 +1,10 @@
 import * as DateUtils from "../utils/date.js";
 import * as ColorUtils from "../utils/color.js";
 import * as ItinSummary from "./itinSummary.js";
+import * as ItinList from "./itinList.js";
+import * as Calendar from "./calendar.js";
+
+const catColors = {};
 
 export function loadInitialMonths(plusMinusAmt) {
     /* =================[ vv Variable Setup vv ]================= */
@@ -81,229 +85,148 @@ export function indicateCurrentDay() {
     // }
 }
 
-const catColors = {};
-
 // Handles event fetching from backend & frontend displaying of events
 export async function loadEvents() {
     document.querySelectorAll("#main .inspector .itinerary .item").forEach(item => item.remove());
     document.querySelectorAll("#main .calendar .bottom .day .eventRibbon").forEach(item => item.remove());
     document.querySelectorAll("#itinSummary .item").forEach(item => item.remove());
 
-    try {
-        const userId = 1;
-        const todayDateObj = new Date();
-        const dateStr = DateUtils.getDateStrForBackend(todayDateObj);
-        const response = await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr);
-        // Live Backend Link: https://qo-lplus.vercel.app/events/...
+    const userId = 1;
+    const todayDateObj = new Date();
+    const dateStr = DateUtils.getDateStrForBackend(todayDateObj);
 
-        await response.json().then(data => {
-            console.log("Events:", data.data);
-            var eventItinElems = [], eventRowElems = [];
-    
-            const events = data.data;
+    // Live Backend Link: https://qo-lplus.vercel.app/events/...
 
-            /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
-            events.sort((event1, event2) => {
-                const date1 = new Date(event1.startTime.substring(0, 2) + ":" + event1.startTime(3, 4) + " " + event1.startDate);
-                const date2 = new Date(event2.startTime.substring(0, 2) + ":" + event2.startTime(3, 4) + " " + event2.startDate);
-                return date1.getTime() - date2.getTime();
-            });
-    
-            /* 2. Generate the color for each category */
-            events.forEach(event => {
-                if (catColors[event.category] == undefined) {
-                    catColors[event.category] = ColorUtils.getRandomColorStr(catColors);
-                }
-            });
-    
-            /* 3. Generate the Itinerary Summary */
-            ItinSummary.spawnEventItinCategory(events, catColors);
-    
-            events.forEach(event => {
-                const eventId = event.eventId,
-                    title = event.title,
-                    category = event.category,
-                    startDateStr = event.startDate,
-                    endDateStr = event.endDate,
-                    startTime = events.startTime,
-                    endTime = event.endTime,
-                    location = event.location,
-                    notes = event.notes;
-    
-                var rowElems = [];
-    
-                const colorStr = catColors[category];
-    
-                /* 3. Generate Itinerary card item */
-                const eventElement =
-                    `<div class="item ${category}">` +
-                    '  <div class="left">' +
-                    `    <div class="period"> ${startDate}hr<br>-<br>${endTime}hr</div>` +
-                    '  </div>' +
-                    '  <div class="right">' +
-                    `    <div class="title"> ${title}</div>` +
-                    `    <div class="info">${notes}</div>` +
-                    '  </div>' +
-                    '  <span class="moreBtn material-symbols-outlined">more_vert</span>' +
-                    '  <div class="moreBtnPopup">' +
-                    '    <div class="inner">' +
-                    '      <div class="moreOptionBtn deleteBtn material-symbols-outlined">delete</div>' +
-                    '    </div>' +
-                    '  </div>' +
-                    '</div>';
-    
-                document.querySelector("#main .inspector .itinerary").insertAdjacentHTML("beforeend", eventElement);
-                const allItinElems = document.querySelector("#main .inspector .itinerary").getElementsByClassName("item"),
-                    eventItinElem = allItinElems[allItinElems.length - 1];
-    
-    
-                eventItinElem.getElementsByClassName("left")[0].style.backgroundColor = colorStr;
-    
-                var startDate = new Date(startDateStr), endDate = new Date(endDateStr);
-                var dayCount = DateUtils.getDayNumBetween(startDate, endDate);
-    
-                const parentDayElem = document.querySelector("#main .calendar .bottom .dayDisplay .day." + startDate.toDateString().replaceAll(" ", ""));
-                var curDate = new Date(startDate.getTime());
-                var nextSundayDelta = DateUtils.getNextSundayDelta(curDate);
-    
-                /* 4. Generate the first row's ribbon  */
-                const firstRowLength = Math.min(nextSundayDelta + 1, dayCount);
-                dayCount -= firstRowLength;
-                const firstRowElem = spawnEventRibbon(parentDayElem, event, firstRowLength, colorStr, true, dayCount == 0);
-                rowElems.push(firstRowElem);
-    
-                /* 5. Generate all subsequent row's ribbons */
-                var fullRowCounter = 0;
-                while (dayCount > 0) {
-                    var curRowLength = Math.min(7, dayCount);
-                    var mondayDate = new Date(startDate.getTime());
-                    mondayDate.setDate(mondayDate.getDate() + firstRowLength + 7 * fullRowCounter);
-                    const mondayElem = document.querySelector("#main .calendar .bottom .day." + mondayDate.toDateString().replaceAll(" ", ""));
-                    dayCount -= curRowLength;
-                    const curRowRibbon = spawnEventRibbon(mondayElem, event, curRowLength, colorStr, false, dayCount == 0);
-                    rowElems.push(curRowRibbon);
-                    fullRowCounter++;
-                }
-    
-                eventItinElems.push(eventItinElem);
-                eventRowElems.push(rowElems);
-    
-                // Register event delete button once all cards and ribbons are created (so it can grab them to delete too)
-                eventItinElem.querySelector(".deleteBtn").addEventListener("click", (event) => {
-                    deleteEvent(eventId, eventItinElem, rowElems);
+    await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr)
+        .then(async (response) => {
+            await response.json().then(data => {
+                const events = data.data;
+
+                /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
+                events.sort((event1, event2) => {
+                    const event1StartTimeStr = toString(event1.startTime), event2StartTimeStr = toString(event2.startTime);
+                    const date1 = new Date(event1StartTimeStr.substring(0, 2) + ":" + event1StartTimeStr.substring(3, 4) + " " + event1.startDate);
+                    const date2 = new Date(event2StartTimeStr.substring(0, 2) + ":" + event2StartTimeStr.substring(3, 4) + " " + event2.endDate);
+                    return date1.getTime() - date2.getTime();
                 });
-            });
-    
-            // Hover-active state linking between itninerary cards and calendar ribbons
-            eventItinElems.forEach((itinElem, index) => {
-    
-                itinElem.addEventListener("mouseenter", event => {
-                    eventRowElems[index].forEach(rowElem => {
-                        if (!rowElem.classList.contains("active"))
-                            rowElem.classList.add("active");
-                    });
+
+                /* 2. Generate the color for each category */
+                events.forEach(event => {
+                    generateCategoryColor(event);
                 });
-    
-                itinElem.addEventListener("mouseleave", event => {
-                    eventRowElems[index].forEach(rowElem => {
-                        if (rowElem.classList.contains("active"))
-                            rowElem.classList.remove("active");
-                    });
-                });
+
+                /* 3. Generate the needed cards and ribbons, then link them together */
+                displayEvents(events);
+            }).catch(error => {
+                console.log("Error while parsing json: ", error);
             });
-    
-            // Each Row Item actives all others when hovered over
-            eventRowElems.forEach(rowGroup => {
-                rowGroup.forEach(rowItem => {
-                    rowItem.addEventListener("mouseenter", event => {
-                        rowGroup.forEach(eachRowItem => {
-                            if (!eachRowItem.classList.contains("active"))
-                                eachRowItem.classList.add("active");
-                        });
-                    });
-    
-                    rowItem.addEventListener("mouseleave", event => {
-                        rowGroup.forEach(eachRowItem => {
-                            if (eachRowItem.classList.contains("active"))
-                                eachRowItem.classList.remove("active");
-                        });
-                    });
-                });
-            });
+        }).catch(response => {
+            console.log("Error while fetching:", response);
         });
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
+}
+
+function displayEvents(events) {
+    events.forEach(event => {
+        displayEvent(event);
+    });
 }
 
 export function displayEvent(event) {
-    loadEvents();
+    // Generate color for the event category if it doesn't exist
+    generateCategoryColor(event);
+
+    ItinSummary.updateItinCategory(event, catColors[event.category], 1);
+    const itinCardElem = ItinList.spawnEventItinCard(event, catColors[event.category]);
+    const ribbonElems = Calendar.spawnEventRibbons(event, catColors[event.category]);
+    linkCardAndRibbons(itinCardElem, ribbonElems);
+    setupDeleteBtn(event, itinCardElem, ribbonElems);
 }
 
-async function deleteEvent(eventId, eventItem, eventRibbons) {
-    try {
-        const response = await fetch("http://localhost:3000/events/" + eventId, {
+function generateCategoryColor(event) {
+    if (catColors[event.category] == undefined) {
+        catColors[event.category] = ColorUtils.getRandomColorStr(catColors);
+    }
+}
+
+function linkCardsAndRibbons(itinCardElems, ribbonElemSet) {
+    itinCardElems.forEach((cardElem, index) => {
+        linkCardAndRibbons(cardElem, ribbonElemSet[index]);
+    });
+}
+
+function linkCardAndRibbons(itinCardElem, ribbonElems) {
+    // Each Card activates all ribbons when hovered over
+    itinCardElem.addEventListener("mouseenter", event => {
+        ribbonElems.forEach(ribbonElem => {
+            if (!ribbonElem.classList.contains("active"))
+                ribbonElem.classList.add("active");
+        });
+    });
+
+    itinCardElem.addEventListener("mouseleave", event => {
+        ribbonElems.forEach(ribbonElem => {
+            if (ribbonElem.classList.contains("active"))
+                ribbonElem.classList.remove("active");
+        });
+    });
+
+    // Each Ribbon activates all others when hovered over
+    ribbonElems.forEach(ribbonElem => {
+        ribbonElem.addEventListener("mouseenter", event => {
+            ribbonElems.forEach(eachRibbonElem => {
+                if (!eachRibbonElem.classList.contains("active"))
+                    eachRibbonElem.classList.add("active");
+            });
+        });
+
+        ribbonElem.addEventListener("mouseleave", event => {
+            ribbonElems.forEach(eachRibbonElem => {
+                if (eachRibbonElem.classList.contains("active"))
+                    eachRibbonElem.classList.remove("active");
+            });
+        });
+    });
+
+    // Each Ribbon activates the card when hovered over
+    ribbonElems.forEach(ribbonElem => {
+        ribbonElem.addEventListener("mouseenter", event => {
+            if (!itinCardElem.classList.contains("active"))
+                itinCardElem.classList.add("active");
+        });
+
+        ribbonElem.addEventListener("mouseleave", event => {
+            if (itinCardElem.classList.contains("active"))
+                itinCardElem.classList.remove("active");
+        });
+    });
+}
+
+async function setupDeleteBtn(event, cardElem, ribbonElems) {
+    cardElem.querySelector(".deleteBtn").addEventListener("click", async () => {
+        await fetch("http://localhost:3000/events/" + event.eventId, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-        });
-        console.log("Response:", response);
-        const data = await response.json().then(data => {
-            console.log(data);
-            eventItem.remove();
-            eventRibbons.forEach(eventRibbon => {
-                eventRibbon.remove();
+        }).then(async (response) => {
+            await response.json()
+            .then(data => {  
+                if (response.status !== 200) {
+                    console.log("Error while deleting event:", data.error);
+                    window.alert(data.error);
+                    return;
+                }
+
+                ItinSummary.updateItinCategory(event, catColors[event.category], -1);
+                cardElem.remove();
+                ribbonElems.forEach(ribbonElem => {
+                    ribbonElem.remove();
+                });
             });
         }).catch(error => {
             console.log("Catching error message");
             console.error("Error:", error.message);
         });
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-function spawnEventItinCard(event) {
-
-}
-
-// Creates an Event Ribbon at the given HTML Element of the specific day
-function spawnEventRibbon(dayElem, event, length, colourStr, hasLeftMargin, hasRightMargin) {
-    const title = event.title, startTime = event.start_time;
-
-    if (title == "Plan Bali Trip") console.log(hasRightMargin + " test");
-
-    const eventRibbonElemStr =
-        `<div class="eventRibbon">` +
-        `   <div class="indicator"></div>` +
-        `   <div class="title">${title}</div>` +
-        `   <div class="time">${startTime}</div>` +
-        `</div>`;
-
-    dayElem.insertAdjacentHTML('beforeend', eventRibbonElemStr);
-            
-    const allDayEvents = dayElem.getElementsByClassName("eventRibbon"),
-        eventRibbonElem = allDayEvents[allDayEvents.length - 1];
-
-    if (!hasLeftMargin) {
-        eventRibbonElem.style.marginLeft = 0;
-        eventRibbonElem.style.borderTopLeftRadius = 0;
-        eventRibbonElem.style.borderBottomLeftRadius = 0;
-    }
-
-    if (!hasRightMargin) {
-        eventRibbonElem.style.marginRight = 0;
-        eventRibbonElem.style.borderTopRightRadius = 0;
-        eventRibbonElem.style.borderBottomRightRadius = 0;
-    }
-
-    eventRibbonElem.getElementsByClassName("indicator")[0]
-        .style.backgroundColor = colourStr;
-    eventRibbonElem.style.width = "calc(" + (100 * length) + "% - " + (hasLeftMargin
-        ? (hasRightMargin ? 28 : 18)
-        : (hasRightMargin ? 18 : 8)) + "px)";
-
-    return eventRibbonElem;
+    });
 }

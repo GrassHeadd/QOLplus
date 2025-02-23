@@ -1,4 +1,3 @@
-import * as DateUtils from "../utils/date.js";
 import * as DisplayEvent from "./displayEvent.js";
 
 export function setupAddEventBtn() {
@@ -30,13 +29,26 @@ export function setupAddEventBtn() {
             endDateUnformated = document.getElementById("eventEndDateInput").value,
             userId = 1;
 
-        const startDate = startDateUnformated.split(" ")[1],
-            endDate = endDateUnformated.split(" ")[1];
+        /* INPUT VALIDATION */
+        // TODO - Implement AI to allow parsing of time and date while preserving input validation
+        if (title.trim() == "") {
+            window.alert("Please enter a valid title")
+            return;
+        }
 
-        const startTime = startDateUnformated.split(" ")[0],
-            endTime = endDateUnformated.split(" ")[0];
+        const timeRegex = /(?:[01]?\d|2[0-3])[0-5]\d\s\d{4}-([1-9]|[01][012])-(0*[1-9]|[1-2]\d|3[01])/;
+        if (!timeRegex.test(startDateUnformated) || !timeRegex.test(endDateUnformated)) {
+            window.alert("Invalid start/end date input format");
+            return;
+        }
 
-        const response = await fetch("http://localhost:3000/events/", {
+        const startDate = startDateUnformated.split(" ")[1].trim(),
+            endDate = endDateUnformated.split(" ")[1].trim();
+
+        const startTime = startDateUnformated.split(" ")[0].trim(),
+            endTime = endDateUnformated.split(" ")[0].trim();
+
+        await fetch("http://localhost:3000/events/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -53,23 +65,30 @@ export function setupAddEventBtn() {
                 startTime: startTime,
                 endTime: endTime
             })
-        });
-        
-        await response.json().then(data => {
-            DisplayEvent.displayEvent({
-                eventId: data.eventId,
-                title: title,
-                location: location,
-                notes: notes,
-                category: category,
-                startDate: startDate,
-                endDate: endDate,
-                startTime: startTime,
-                endTime: endTime
-            });
+        }).then(async (response) => {
+            await response.json()
+            .then(data => {
+                if (response.status !== 200) {
+                    console.log("Error while adding event:", data.error);
+                    window.alert(data.error);
+                    return;
+                }
+
+                DisplayEvent.displayEvent({
+                    eventId: data.eventId,
+                    title: title,
+                    location: location,
+                    notes: notes,
+                    category: category,
+                    startDate: startDate,
+                    endDate: endDate,
+                    startTime: startTime,
+                    endTime: endTime
+                });
+            })
         }).catch((error) => {
-            window.alert("Error creating event");
-            console.error("Could not create:", error);
+            window.alert("Error while sending request to backend");
+            console.error("Error while sending request to backend:", error);
         });
     });
 }
