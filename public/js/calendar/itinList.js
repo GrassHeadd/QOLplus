@@ -32,6 +32,7 @@ export function spawnEventItinCard(event, catColor) {
         '  <span class="moreBtn material-symbols-outlined">more_vert</span>' +
         '  <div class="moreBtnPopup">' +
         '    <div class="inner">' +
+        '      <div class="moreOptionBtn editBtn material-symbols-outlined">edit</div>' +
         '      <div class="moreOptionBtn deleteBtn material-symbols-outlined">delete</div>' +
         '    </div>' +
         '  </div>' +
@@ -44,6 +45,12 @@ export function spawnEventItinCard(event, catColor) {
 
     // Style the card according to its category's color
     cardElem.getElementsByClassName("left")[0].style.backgroundColor = catColor;
+
+    const moreBtn = cardElem.querySelector(".moreBtn");
+    moreBtn.addEventListener("click", () => {
+        moreBtn.innerHTML = moreBtn.innerHTML == "close" ? "more_vert" : "close";
+        cardElem.querySelector(".moreBtnPopup").classList.toggle("active");
+    });
 
     return cardElem;
 }

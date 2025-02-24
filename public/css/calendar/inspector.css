@@ -334,37 +334,67 @@
 }
 
 #main .inspector .itinerary .item .moreBtn {
+  cursor: pointer;
+  color: #ababab;
   position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 18px;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  transition: 0.15s ease-in-out color;
+}
+
+#main .inspector .itinerary .item .moreBtn:hover {
+  color: #e1e1e1;
 }
 
 #main .inspector .itinerary .item .moreBtnPopup {
+  display: none;
   position: absolute;
-  top: 3px;
-  right: 8px;
+  top: 32px;
+  right: 12px;
   font-size: 18px;
-  background-color: #4d5055;
-  border-radius: 0.5em;
+  width: calc(100% - 154px); /* Depends on .left size (100px + 15px LR padding), then + 16px LR for padding */
+}
+
+#main .inspector .itinerary .item .moreBtnPopup.active {
+  display: flex;
 }
 
 #main .inspector .itinerary .item .moreBtnPopup .inner {
   position: relative;
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
   width: 100%;
   height: 100%;
 }
 
 #main .inspector .itinerary .item .moreBtnPopup .inner .moreOptionBtn {
-  margin: 5px;
+  padding: 5px;
   cursor: pointer;
+  background-color: #575759;
+  border-radius: 0.5em;
+  margin-left: 5px;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner .moreOptionBtn:hover {
+  background-color: rgb(113, 113, 116);
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner .editBtn {
+  color: rgb(135, 135, 135);
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner .editBtn:hover {
+  color: rgb(165, 165, 165);
 }
 
 #main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn {
-  margin: 5px;
-  color: rgb(236, 55, 55);
+  color: rgb(210 81 81);
+}
+
+#main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn:hover {
+  color: rgb(211, 64, 64);
 }
 
 #main .inspector .itinerary .item.active, #main .inspector .itinerary .item:hover {

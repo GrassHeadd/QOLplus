@@ -139,6 +139,7 @@ export function displayEvent(event) {
     const itinCardElem = ItinList.spawnEventItinCard(event, catColors[event.category]);
     const ribbonElems = Calendar.spawnEventRibbons(event, catColors[event.category]);
     linkCardAndRibbons(itinCardElem, ribbonElems);
+    setupEditBtn(event, itinCardElem, ribbonElems);
     setupDeleteBtn(event, itinCardElem, ribbonElems);
 }
 
@@ -198,6 +199,12 @@ function linkCardAndRibbons(itinCardElem, ribbonElems) {
             if (itinCardElem.classList.contains("active"))
                 itinCardElem.classList.remove("active");
         });
+    });
+}
+
+async function setupEditBtn(event, cardElem, ribbonElems) {
+    cardElem.querySelector(".editBtn").addEventListener("click", async () => {
+        window.alert("WIP");
     });
 }
 
