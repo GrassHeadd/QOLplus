@@ -110,6 +110,9 @@ export async function loadEvents() {
                     return date1.getTime() - date2.getTime();
                 });
 
+                console.log(events);
+                
+
                 /* 2. Generate the color for each category */
                 events.forEach(event => {
                     generateCategoryColor(event);
@@ -203,8 +206,66 @@ function linkCardAndRibbons(itinCardElem, ribbonElems) {
 }
 
 async function setupEditBtn(event, cardElem, ribbonElems) {
-    cardElem.querySelector(".editBtn").addEventListener("click", async () => {
-        window.alert("WIP");
+    const moreBtn = cardElem.querySelector(".moreBtn"),
+          moreBtnPopup = cardElem.querySelector(".moreBtnPopup"),
+          editBtnPopup = cardElem.querySelector(".editBtnPopup"),
+          confirmEditBtn = editBtnPopup.querySelector(".confirmBtn"),
+          cancelEditBtn = editBtnPopup.querySelector(".cancelBtn");
+
+    const startTimeInput = cardElem.querySelector("#itemStartTimeInput"),
+          endTimeInput = cardElem.querySelector("#itemEndTimeInput"),
+          titleInput = cardElem.querySelector("#itemTitleInput"),
+        //   locInput = cardElem.querySelector("#itemLocInput"),
+          infoInput = cardElem.querySelector("#itemInfoInput");
+
+    const startTimeText = cardElem.querySelector(".startTime"),
+          endTimeText = cardElem.querySelector(".endTime"),
+          titleText = cardElem.querySelector(".title"),
+        //   locText = cardElem.querySelector(".location"),
+          infoText = cardElem.querySelector(".info");
+
+    // On edit, swap to edit view with input fields and edit popup icons
+    cardElem.querySelector(".editBtn").addEventListener("click", () => {
+        moreBtn.classList.toggle("hidden");
+        moreBtn.innerHTML = "more_vert";
+        moreBtnPopup.classList.toggle("active");
+        editBtnPopup.classList.toggle("active");
+
+        startTimeInput.value = DateUtils.getCreateEventDateFormatStr(event.startTime, event.startDate);
+        endTimeInput.value = DateUtils.getCreateEventDateFormatStr(event.endTime, event.endDate);
+        titleInput.value = titleText.innerHTML.trim();
+        // locInput.value = locText.innerHTML;
+        infoInput.value = infoText.innerHTML.trim();
+
+        startTimeInput.classList.toggle("hidden");
+        endTimeInput.classList.toggle("hidden");
+        titleInput.classList.toggle("hidden");
+        // locInput.classList.toggle("hidden");
+        infoInput.classList.toggle("hidden");
+
+        startTimeText.classList.toggle("hidden");
+        endTimeText.classList.toggle("hidden");
+        titleText.classList.toggle("hidden");
+        // locText.classList.toggle("hidden");
+        infoText.classList.toggle("hidden");
+    });
+
+    // On cancel, return back to normal card state and swap icons back
+    cancelEditBtn.addEventListener("click", () => {
+        moreBtn.classList.toggle("hidden");
+        editBtnPopup.classList.toggle("active");
+
+        startTimeInput.classList.toggle("hidden");
+        endTimeInput.classList.toggle("hidden");
+        titleInput.classList.toggle("hidden");
+        // locInput.classList.toggle("hidden");
+        infoInput.classList.toggle("hidden");
+
+        startTimeText.classList.toggle("hidden");
+        endTimeText.classList.toggle("hidden");
+        titleText.classList.toggle("hidden");
+        // locText.classList.toggle("hidden");
+        infoText.classList.toggle("hidden");
     });
 }
 

@@ -25,8 +25,8 @@ export function setupAddEventBtn() {
             location = document.getElementById("eventLocInput").value,
             notes = document.getElementById("eventNotesInput").value,
             category = document.getElementById("eventCategoryInput").value,
-            startDateUnformated = document.getElementById("eventStartDateInput").value,
-            endDateUnformated = document.getElementById("eventEndDateInput").value,
+            startDateUnformatted = document.getElementById("eventStartDateInput").value,
+            endDateUnformatted = document.getElementById("eventEndDateInput").value,
             userId = 1;
 
         /* INPUT VALIDATION */
@@ -37,16 +37,16 @@ export function setupAddEventBtn() {
         }
 
         const timeRegex = /(?:[01]?\d|2[0-3])[0-5]\d\s\d{4}-([1-9]|[01][012])-(0*[1-9]|[1-2]\d|3[01])/;
-        if (!timeRegex.test(startDateUnformated) || !timeRegex.test(endDateUnformated)) {
+        if (!timeRegex.test(startDateUnformatted) || !timeRegex.test(endDateUnformatted)) {
             window.alert("Invalid start/end date input format");
             return;
         }
 
-        const startDate = startDateUnformated.split(" ")[1].trim(),
-            endDate = endDateUnformated.split(" ")[1].trim();
+        const startDate = startDateUnformatted.split(" ")[1].trim(),
+            endDate = endDateUnformatted.split(" ")[1].trim();
 
-        const startTime = startDateUnformated.split(" ")[0].trim(),
-            endTime = endDateUnformated.split(" ")[0].trim();
+        const startTime = startDateUnformatted.split(" ")[0].trim(),
+            endTime = endDateUnformatted.split(" ")[0].trim();
 
         await fetch("http://localhost:3000/events/", {
             method: "POST",

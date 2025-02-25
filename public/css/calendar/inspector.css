@@ -347,20 +347,24 @@
   color: #e1e1e1;
 }
 
-#main .inspector .itinerary .item .moreBtnPopup {
+#main .inspector .itinerary .item .moreBtnPopup, #main .inspector .itinerary .item .editBtnPopup  {
   display: none;
   position: absolute;
   top: 32px;
   right: 12px;
   font-size: 18px;
-  width: calc(100% - 154px); /* Depends on .left size (100px + 15px LR padding), then + 16px LR for padding */
+  /* width: calc(100% - 154px); */ /* Depends on .left size (100px + 15px LR padding), then + 16px LR for padding */
 }
 
-#main .inspector .itinerary .item .moreBtnPopup.active {
+#main .inspector .itinerary .item .editBtnPopup  {
+  top: 10px;
+}
+
+#main .inspector .itinerary .item .moreBtnPopup.active, #main .inspector .itinerary .item .editBtnPopup.active {
   display: flex;
 }
 
-#main .inspector .itinerary .item .moreBtnPopup .inner {
+#main .inspector .itinerary .item .moreBtnPopup .inner, #main .inspector .itinerary .item .editBtnPopup .inner {
   position: relative;
   display: flex;
   justify-content: flex-end;
@@ -368,7 +372,7 @@
   height: 100%;
 }
 
-#main .inspector .itinerary .item .moreBtnPopup .inner .moreOptionBtn {
+#main .inspector .itinerary .item .moreBtnPopup .inner .moreOptionBtn, #main .inspector .itinerary .item .editBtnPopup .inner .editOptionBtn  {
   padding: 5px;
   cursor: pointer;
   background-color: #575759;
@@ -389,12 +393,20 @@
   color: rgb(165, 165, 165);
 }
 
-#main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn {
+#main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn, #main .inspector .itinerary .item .editBtnPopup .inner .cancelBtn {
   color: rgb(210 81 81);
 }
 
-#main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn:hover {
+#main .inspector .itinerary .item .moreBtnPopup .inner .deleteBtn:hover, #main .inspector .itinerary .item .editBtnPopup .inner .cancelBtn:hover  {
   color: rgb(211, 64, 64);
+}
+
+#main .inspector .itinerary .item .editBtnPopup .inner .confirmBtn {
+  color: rgb(47, 212, 63);
+}
+
+#main .inspector .itinerary .item .editBtnPopup .inner .confirmBtn:hover {
+  color: rgb(81, 210, 94);
 }
 
 #main .inspector .itinerary .item.active, #main .inspector .itinerary .item:hover {
@@ -413,8 +425,28 @@
   font-size: 16px;
   line-height: 18px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
+}
+
+#main .inspector .itinerary .item input {
+  font-family: "Gloria Hallelujah", cursive;
+  font-size: 16px;
+  background-color: transparent;
+  color: rgb(216, 216, 216);
+  padding: 0px 10px;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.653);
+}
+
+#main .inspector .itinerary .item input:focus {
+  outline: none;
+}
+
+#main .inspector .itinerary .item .left input {
+  width: 50px;
   text-align: center;
 }
 
@@ -428,6 +460,11 @@
   line-height: 20px;
   color: gray;
   background-color: #44464b;
+}
+
+#main .inspector .itinerary .item .right input#itemTitleInput {
+  width: calc(100% - 40px);
+  padding-left: 0;
 }
 
 #main .inspector .itinerary .item .right .title {
@@ -449,6 +486,44 @@
   margin-top: 5px;
   line-height: 17px;
   color: rgb(163, 163, 163);
+}
+
+#main .inspector .itinerary .item .right textArea#itemInfoInput {
+  font-family: "Gloria Hallelujah", cursive;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  margin-top: 5px;
+  line-height: 17px;
+  color: rgb(163, 163, 163);
+  width: calc(100% - 20px);
+  height: calc(100% - 14px);
+  padding-right: 10px;
+  resize: none;
+  background-color: transparent;
+  border: none;
+}
+
+#main .inspector .itinerary .item .right textArea#itemInfoInput:focus {
+  outline: none;
+}
+
+#main .inspector .itinerary .item .right textArea#itemInfoInput::-webkit-scrollbar {
+  width: 8px;
+}
+
+#main .inspector .itinerary .item .right textArea#itemInfoInput::-webkit-scrollbar-thumb {
+  background: rgb(83, 83, 83);
+  border-radius: 1em;
+  transition: 0.15s ease-in-out; /* Doesn't seem to affect scrollbars :/ */
+}
+
+#main .inspector .itinerary .item .right textArea#itemInfoInput::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(126, 126, 126);
+}
+
+#main .inspector .itinerary .item .right textArea#itemInfoInput::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 @keyframes itinCardHoverAnim {

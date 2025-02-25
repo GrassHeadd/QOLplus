@@ -26,3 +26,8 @@ export function getYYYYMMFromDateObj(dateObj) {
 export function getDateStrForBackend(dateObj) {
     return dateObj.getFullYear() + "-" + (dateObj.getMonth() + 1) + "-" + dateObj.getDate();
 }
+
+export function getCreateEventDateFormatStr(time, date) {
+    return time < 1000 ? "0" + time : time +
+           " " + date;
+}

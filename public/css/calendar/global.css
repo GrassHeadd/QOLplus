@@ -21,3 +21,7 @@ button {
   border: none;
   background-color: transparent;
 }
+
+.hidden {
+  display: none !important;
+}
