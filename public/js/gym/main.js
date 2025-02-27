@@ -1,18 +1,24 @@
 import * as DateUtils from '../utils/date.js';
+import { addDataToTable } from './display.js';
 
 const date = new Date();
-const formattedDate = DateUtils.getDateStrForBackend(date);
-const currDate = DateUtils.getDateStrForBackend(Date.now());
+const currDate = DateUtils.getDateStrForBackend(date);
+const nextMonthDate = new Date(date.getFullYear(), date.getMonth() + 1, date.getDate());
+const prevMonthDate = new Date(date.getFullYear(), date.getMonth() - 1, date.getDate());
+const nextMonth = DateUtils.getDateStrForBackend(nextMonthDate);
+const prevMonth = DateUtils.getDateStrForBackend(prevMonthDate);
 
 // On page load, fetch data
 window.addEventListener("DOMContentLoaded", async () => {
-  await fetchExerciseDataWeek();
-  // or fetchExerciseDataMonth(); if you want
+  await fetchExerciseDataMonth(currDate);
+  await fetchExerciseDataMonth(nextMonth);
+  await fetchExerciseDataMonth(prevMonth);
+  // or fetchExerciseDataWeek(); if you want
 });
 
-async function fetchExerciseDataWeek() {
+async function fetchExerciseDataWeek(date) {
   try {
-    const response = await fetch(`http://localhost:3000/exercises/1/week/${formattedDate}`, {
+    const response = await fetch(`http://localhost:3000/exercises/1/week/${date}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -20,43 +26,50 @@ async function fetchExerciseDataWeek() {
       }
     });
     const data = await response.json();
-    console.log(data);
-    // Process the exercise data here
   } catch (error) {
     console.error('There has been a problem with your fetch operation:', error);
   }
 }
 
-async function fetchExerciseDataMonth() {
+async function fetchExerciseDataMonth(date) {
   try {
-    const response = await fetch(`http://localhost:3000/exercises/1/week/${formattedDate}`, {
+    const response = await fetch(`http://localhost:3000/exercises/1/month/${date}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       }
     });
-    const data = await response.json();
-    console.log(data);
-    addDataToList(data);
-    // Process the exercise data here
+    const data= await response.json();
+    console.log(data);  
+    console.log("it did fetch");
+    data.data.forEach((item) => {
+      const exerciseDate = new Date(item.date);
+      // Convert currDate to a Date object for proper comparison if needed
+      if(exerciseDate < new Date(currDate)) {
+        addDataToTable(item, 'past');
+      } else {
+        addDataToTable(item, 'upcoming');
+      }
+    });
   } catch (error) {
     console.error('There has been a problem with your fetch operation:', error);
   }
 }
 
-function splitData(data) {
-  const futureData = data.filter((item) => item.startDate >= currDate);
-  const pastData = data.filter((item) => item.startDate < currDate);
-  pastDisplay = pastData;
-}
-
-function addDataToList(data) {
-  const listElem = document.getElementById('exerciseList');
-  listElem.innerHTML = '';
-  data.forEach((item) => {
-    const listItem = document.createElement('li');
-    listItem.innerHTML = `${item.title} - ${item.startDate}`;
-    listElem.appendChild(listItem);
-  });
+async function postExerciseData(data) {
+  try {
+    const response = await fetch('http://localhost:3000/exercises', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    const responseData = await response.json();
+    console.log(responseData);
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
 }

@@ -8,11 +8,13 @@
     <!-- CSS -->
     <link rel="stylesheet" href="./css/gym/gym.css" />
     <link rel="stylesheet" href="./css/gym/global.css" />
+    <link rel="stylesheet" href="./css/gym/addEvent.css" />
 
     <!-- JS Scripts -->
     <script src="./js/utils/color.js" type="module"></script>
     <script src="./js/utils/date.js" type="module"></script>
     <script src="./js/gym/main.js" type="module"></script>
+    <script src="./js/gym/addEvent.js" type="module"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,18 +39,52 @@
     </header>
 
     <main>
+      <section id="add-workout" class="workout-section">
+        <h2 class="section-title">Add New Exercise</h2>
+        <div class="add-workout">
+          <form action="/public/gym.html" method="post">
+        <table class="table">
+          <tr>
+            <td><label for="date">Date:</label></td>
+            <td><input type="date" id="date" name="date"></td>
+          </tr>
+          <tr>
+            <td><label for="exercise">Exercise:</label></td>
+            <td><input type="text" id="exercise" name="exercise"></td>
+          </tr>
+          <tr>
+            <td><label for="details">Details:</label></td>
+            <td><input type="text" id="details" name="details"></td>
+          </tr>
+          <tr>
+            <td><label for="notes">Notes:</label></td>
+            <td><input type="text" id="notes" name="notes"></td>
+          </tr>
+          <tr>
+            <td colspan="2" style="text-align: center;">
+          <input type="submit" value="Submit">
+            </td>
+          </tr>
+        </table>
+          </form>
+        </div>
+      </section>
+      
       <!-- Upcoming Section -->
       <section id="upcoming-workout" class="workout-section">
         <h2 class="section-title">Upcoming Exercises</h2>
         <div class="upcoming">
           <table class="table">
-            <tr class="header">
-              <th>Date</th>
-              <th>Exercise Name</th>
-              <th>Details</th>
-              <th>Notes</th>
-            </tr>
-            <tr class="logs">
+            <thread>
+              <tr class="header">
+                <th>Date</th>
+                <th>Exercise Name</th>
+                <th>Details</th>
+                <th>Notes</th>
+              </tr>
+            </thread>
+            <tbody class="logs">
+              <!-- logs row added here -->
               <!-- <td>2025-10-01</td>
               <td>Back Day</td>
               <td>
@@ -61,7 +97,8 @@
               <td>Bring Towel &amp; Sports Attire.</td> -->
               <tr class="default">
                 <td colspan="4">You have no plans yet, loser.</td>
-            </tr>
+              </tr>
+            </tbody>
           </table>
         </div>
       </section>
@@ -71,26 +108,20 @@
         <h2 class="section-title">Past Exercises</h2>
         <div class="past">
           <table class="table">
-            <tr class="header">
-              <th>Date</th>
-              <th>Exercise Name</th>
-              <th>Details</th>
-              <th>Notes</th>
-            </tr>
-            <tr class="logs">
-              <!-- <td>2025-10-01</td>
-              <td>Back Day</td>
-              <td>
-                set 1: 10<br />
-                set 2: 12<br />
-                set 3: 15<br />
-                set 4: 12<br />
-                set 5: 10
-              </td>
-              <td>Bring Towel &amp; Sports Attire.</td> -->
+            <thead>
+              <tr class="header">
+                <th>Date</th>
+                <th>Exercise Name</th>
+                <th>Details</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody class="logs">
+              <!-- Log rows will be added here -->
               <tr class="default">
                 <td colspan="4">You have not done any exercises yet, loser.</td>
-            </tr>
+              </tr>
+            </tbody>
           </table>
         </div>
       </section>
