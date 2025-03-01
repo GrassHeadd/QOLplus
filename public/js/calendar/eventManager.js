@@ -6,144 +6,126 @@ import * as Calendar from "./calendar.js";
 
 const catColors = {};
 
-export function loadInitialMonths(plusMinusAmt) {
-    /* =================[ vv Variable Setup vv ]================= */
-    // No arguments in Date constructor = today's date
-    // Using 0 as "day" automatically sets the date to the last day of the previous month, hence some currMonthIndex + 1
-    const currMonthDate = new Date(), currYear = currMonthDate.getFullYear(), currMonthIndex = currMonthDate.getMonth();
-    const currMonthStartDate = new Date(currYear, currMonthIndex, 1), startMonthDate = new Date(currYear, currMonthIndex - plusMinusAmt, 1), endMonthDate = new Date(currYear, currMonthIndex + plusMinusAmt + 1, 0);
-
-    // dowOfFdom = Day of week of the first day of start month
-    // Date.getDay() returns 0-6 Sunday to Monday, so this formula converts it to 1-7 Monday to Sunday for convenience
-    const dowOfFirstOfCurrMth = (currMonthStartDate.getDay() + 7) % 8 + Math.ceil(currMonthStartDate.getDay() / 8), dowOfFirstOfStartMth = (startMonthDate.getDay() + 7) % 8 + Math.ceil(startMonthDate.getDay() / 8);
-
-    const endMonthDateStr = endMonthDate.toDateString();
-    const dayDisplayElem = document.getElementById("main").getElementsByClassName("calendar")[0].getElementsByClassName("bottom")[0].getElementsByClassName("dayDisplay")[0];
-
-    /* =====================[ vv Main Logic vv ]===================== */
-
-    // This loop temporarily creates day items to fill up any extra space before the 1st day of the start month
-    // TODO: In dynamic loading, remove these when the other months load in the background (otherwise there'll be duplicates)
-    for (var i = dowOfFirstOfStartMth - 1; i > 0; i--) {
-        dayDisplayElem.innerHTML += "<div class=\"day\"><div>";
-    }
-
-    // Handles creation of all date elements between startMonthDate and endMonthDate
-    while (true) {
-        if (startMonthDate.toDateString() == endMonthDateStr) break;
-
-        var eventsHtml = "";
-        /*"<div class=\"events\">" +
-              "<div class=\"item gym\">" +
-              "<div class=\"marker\"></div>" +
-              "<div class=\"label\">" + labelText + "</div>" +
-              "<div class=\"amount\">" + timeText + "</div>" +
-          "</div>" +
-        "</div>";
-        */
-
-        dayDisplayElem.innerHTML +=
-            "<div class=\"day " + startMonthDate.toDateString().replaceAll(" ", "") + "\">" +
-            "<div class=\"date dayMarker\">" + startMonthDate.getDate() + "</div>"
-            + eventsHtml +
-            "</div>";
-
-        startMonthDate.setDate(startMonthDate.getDate() + 1);
-    }
-
-    // Snap to the first day of the current month;
-    dayDisplayElem.getElementsByClassName(currMonthStartDate.toDateString().replaceAll(" ", ""))[0].scrollIntoView();
-
-    // The default view can only show up to 5 rows, hence we check and move it down by 1 if the current date happens to past the 5th row
-    // E.g. 30 September 2024 is on the 6th row of the month
-    if (dowOfFirstOfCurrMth - 1 + currMonthDate.getDate() > 35) {
-        dayDisplayElem.getElementsByClassName(new Date(currYear, currMonthIndex, 8).toDateString().replaceAll(" ", ""))[0].scrollIntoView();
-    }
-}
-
-export function loadOtherMonths() {
-}
-
-export function indicateCurrentDay() {
-    // // Grab current day and then the date as number
-    // const currDate = new Date(); //get date
-    // var currDateNum = currDate.getDate(); //get day
-
-    // // Grab all 35 day HTML elements
-    // const allDayElements = document
-    //   .getElementsByClassName("dayDisplay")[0]
-    //   .getElementsByClassName("day");
-
-    // // Loop through the 35 HTMl elements
-    // for (var i = 0; i < allDayElements.length; i++) {
-    //   const dayElement = allDayElements[i];
-
-    //   // Find which one has a date number that matches the current day, then add the "today" class to it so the CSS kicks into effect
-    //   if (dayElement.getElementsByClassName("date")[0].innerHTML == currDateNum) {
-    //     dayElement.getElementsByClassName("date")[0].classList.add("today");
-    //   } //add the class for css to the day that is today
-    // }
-}
-
-// Handles event fetching from backend & frontend displaying of events
-export async function loadEvents() {
-    document.querySelectorAll("#main .inspector .itinerary .item").forEach(item => item.remove());
-    document.querySelectorAll("#main .calendar .bottom .day .eventRibbon").forEach(item => item.remove());
-    document.querySelectorAll("#itinSummary .item").forEach(item => item.remove());
-
-    const userId = 1;
-    const todayDateObj = new Date();
-    const dateStr = DateUtils.getDateStrForBackend(todayDateObj);
-
-    // Live Backend Link: https://qo-lplus.vercel.app/events/...
-
-    await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr)
-        .then(async (response) => {
-            await response.json().then(data => {
-                const events = data.data;
-
-                /* 1. Sort the events by start date so events with earlier dates are created at the top of the event ribbon stack */
-                events.sort((event1, event2) => {
-                    const event1StartTimeStr = toString(event1.startTime), event2StartTimeStr = toString(event2.startTime);
-                    const date1 = new Date(event1StartTimeStr.substring(0, 2) + ":" + event1StartTimeStr.substring(3, 4) + " " + event1.startDate);
-                    const date2 = new Date(event2StartTimeStr.substring(0, 2) + ":" + event2StartTimeStr.substring(3, 4) + " " + event2.endDate);
-                    return date1.getTime() - date2.getTime();
-                });
-
-                console.log(events);
-                
-
-                /* 2. Generate the color for each category */
-                events.forEach(event => {
-                    generateCategoryColor(event);
-                });
-
-                /* 3. Generate the needed cards and ribbons, then link them together */
-                displayEvents(events);
-            }).catch(error => {
-                console.log("Error while parsing json: ", error);
-            });
-        }).catch(response => {
-            console.log("Error while fetching:", response);
+// Logic for loading all events progressively
+export async function loadAllEvents(userId = 1) {
+    // Load current month's events
+    await getMonthEvents(userId, new Date("2025-2-1"))
+    .then(monthEvents => {
+        const weekMap = splitMonthEventsToWeeks(monthEvents);
+        
+        // Generate color for each category, if it doesn't already exist
+        monthEvents.forEach(event => {
+            generateCategoryColor(event);
         });
+
+        // Call rendering one week at a time for the month
+        for (var i = 0; i < 6; i++) {
+            const week = weekMap[i], weekEvents = week.events;
+            if (weekEvents.length > 0) displayWeekEvents(week.weekStart, week.weekEnd, weekEvents);
+        }
+    });
+    
+    // TODO: Load +1 and -1 months' events until limit of calendar view
+} 
+
+// Fetches events for 1 month
+async function getMonthEvents(userId, dateObj) {
+    return new Promise(async (resolve, reject) => {
+        const dateStr = DateUtils.getDateStrForBackend(dateObj);
+
+        // Live Backend Link: https://qo-lplus.vercel.app/events/...
+
+            await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr)
+            .then(async (response) => {
+                await response.json().then(data => {
+                    resolve(data.data);
+                }).catch(error => {
+                    console.log("Error while parsing json: ", error);
+                    reject(null);
+                });
+            }).catch(response => {
+                console.log("Error while fetching:", response);
+                reject(null);
+            });
+    });
 }
 
-function displayEvents(events) {
-    events.forEach(event => {
-        displayEvent(event);
-    });
+// Splits a month's events into array of weeks rows
+function splitMonthEventsToWeeks(monthEvents) {
+    if (monthEvents.length == 0) return monthEvents;
+    const weeks = {};
+    
+    // 1. Begin with the first day of first week (which can go into previous month)
+    const curDate = new Date(monthEvents[0].startDate);
+    curDate.setDate(1); // Find first day of the month
+    curDate.setDate(curDate.getDate() - (curDate.getDay() == 0 ? 6 : curDate.getDay() - 1)); // Set to monday of that week
+
+    // 2. Loop through each week's monday and add events that occur during that week into array
+    // Can go up to 6 weeks, e.g. if month starts on a Sunday and is >= 30 days
+    // Events fetched in this month can absolutely span outside the 6 weeks but we just let the other months handle the rendering if it does
+    for (var i = 0; i < 6; i++) {
+        const week = [];
+        
+        // Calculate the sunday of the week (range end)
+        const curSunday = new Date(curDate);
+        curSunday.setDate(curSunday.getDate() + 6);
+
+        // Get events that occur during this week
+        const weekEvents = monthEvents.filter(event => DateUtils.doesStartEndOccupyRange(new Date(event.startDate), new Date(event.endDate), curDate, curSunday)).map(event => {
+            // Make a copy each event that fits the criteria, but with the start/end dates clamped to the week's bounds
+            const eventSlice = cloneEvent(event);
+            eventSlice.startDate = new Date(event.startDate);
+            eventSlice.endDate = new Date(event.endDate);
+            eventSlice.hasPrevious = false;
+            eventSlice.hasNext = false;
+            if (eventSlice.startDate.getTime() < curDate.getTime()) {
+                eventSlice.startDate = new Date(curDate.getTime());
+                eventSlice.hasPrevious = true;
+            }
+            if (eventSlice.endDate.getTime() > curSunday.getTime()) {
+                eventSlice.endDate = new Date(curSunday.getTime());
+                eventSlice.hasNext = true;
+            }
+            return eventSlice;
+        });
+        // StartDate and EndDate are to detect if any event has any next/previous weeks
+        weeks[i] = { weekStart: curDate, weekEnd: curSunday, events: weekEvents};
+
+        curDate.setDate(curDate.getDate() + 7); // Increment to next week's monday
+    }
+
+    return weeks;
+}
+
+function cloneEvent(event) {
+    return {
+        eventId: event.eventId,
+        title: event.title,
+        category: event.category,
+        startDate: event.startDate,
+        startTime: event.startTime,
+        endDate: event.endDate,
+        endTime: event.endTime,
+        location: event.location,
+        notes: event.notes
+    };
+}
+
+function displayWeekEvents(weekStart, weekEnd, weekEvents) {
+    const ribbons = Calendar.renderWeekRibbons(weekStart, weekEnd, weekEvents, catColors);
+    
 }
 
 export function displayEvent(event) {
     // Generate color for the event category if it doesn't exist
     generateCategoryColor(event);
 
-    ItinSummary.updateItinCategory(event, catColors[event.category], 1);
-    const itinCardElem = ItinList.spawnEventItinCard(event, catColors[event.category]);
+    // ItinSummary.updateItinCategory(event, catColors[event.category], 1);
+    // const itinCardElem = ItinList.spawnEventItinCard(event, catColors[event.category]);
     const ribbonElems = Calendar.spawnEventRibbons(event, catColors[event.category]);
-    linkCardAndRibbons(itinCardElem, ribbonElems);
-    setupEditBtn(event, itinCardElem, ribbonElems);
-    setupDeleteBtn(event, itinCardElem, ribbonElems);
+    // linkCardAndRibbons(itinCardElem, ribbonElems);
+    // setupEditBtn(event, itinCardElem, ribbonElems);
+    // setupDeleteBtn(event, itinCardElem, ribbonElems);
 }
 
 function generateCategoryColor(event) {

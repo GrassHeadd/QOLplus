@@ -1,12 +1,13 @@
-import * as displayEvent from "./displayEvent.js";
-import * as addEvent from "./addEvent.js";
+import * as Calendar from "./calendar.js";
+import * as EventManager from "./eventManager.js";
+import * as AddEvent from "./addEvent.js";
 
 // Only load the necessary code after the entire document loads, so the code doesn't run when there's nothing on the page yet
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
-  displayEvent.loadInitialMonths(3);
-  displayEvent.loadOtherMonths();
-  displayEvent.loadEvents();
-  displayEvent.indicateCurrentDay();
+  Calendar.loadInitialMonths(3);
+  Calendar.indicateCurrentDay();
 
-  addEvent.setupAddEventBtn();
+  EventManager.loadAllEvents();
+
+  AddEvent.setupAddEventBtn();
 });

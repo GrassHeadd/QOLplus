@@ -31,3 +31,11 @@ export function getCreateEventDateFormatStr(time, date) {
     return time < 1000 ? "0" + time : time +
            " " + date;
 }
+
+// Requires Date Objects for all 4 parameters
+export function doesStartEndOccupyRange(startObj, endObj, rangeStartObj, rangeEndObj) {
+    const start = startObj.getTime(), end = endObj.getTime(), rangeStart = rangeStartObj.getTime(), rangeEnd = rangeEndObj.getTime();
+    return (start >= rangeStart && start <= rangeEnd) || // If the start date is within the range
+           (end >= rangeStart && end <= rangeEnd) || // If the end date is within the range
+           (start <= rangeStart && end >= rangeEnd); // If the range is within the start and end date
+}

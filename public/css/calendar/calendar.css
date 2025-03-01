@@ -33,6 +33,7 @@
     margin-right: 10px;
 }
 
+/* Saturday and Sunday headers will have a different text color */
 #main .calendar .bottom .header .dayName:nth-child(6n),
 #main .calendar .bottom .header .dayName:nth-child(7n) {
     color: #ffffff;
@@ -51,29 +52,32 @@
     color: #FFFFFF;
 }
 
-#main .calendar .dayDisplay .day:is(:nth-child(7n + 6), :nth-child(7n + 7))/*:nth-child(-n + 35)*/ {
+/* All days will have a bottom border */
+#main .calendar .dayDisplay .day {
+    border-bottom: 1px solid rgb(105, 105, 105);
+}
+
+/* All day elements that is not sunday will have a right border */
+#main .calendar .dayDisplay .day:is(:not(:nth-child(7n + 7))) {
+    border-right: 1px solid rgb(105, 105, 105);
+}
+
+/* Sunday and Saturday will have different background & border color */
+#main .calendar .dayDisplay .day:is(:nth-child(7n + 6), :nth-child(7n + 7)) {
     background-color: #343639;
     color: rgb(202, 202, 202);
     border-color: rgb(157, 157, 157) !important;
 }
 
-#main .calendar .dayDisplay .day:is(:not(:nth-child(7n + 7)))/*:nth-child(-n + 35)*/ {
-    border-right: 1px solid rgb(105, 105, 105);
-}
-
-#main .calendar .dayDisplay .day:is(:not(:nth-child(29), :nth-child(30), :nth-child(31), :nth-child(32), :nth-child(33), :nth-child(34), :nth-child(35))) {
-    border-bottom: 1px solid rgb(105, 105, 105);
-}
-
-
 /* Event Marker */
 #main .calendar .dayDisplay .day .eventRibbon {
-    position: relative;
+    position: absolute;
     z-index: 200;
     width: calc(100% - 28px);
+    height: 11%;
     color: white;
     margin: 0 10px;
-    margin-top: 5px;
+    margin-top: 27px; /* Default margin-top if ribbon is top in the day's event list */
     padding: 5px;
     display: flex;
     font-size: 15px;
@@ -155,7 +159,7 @@
     right: 2px;
 }
 
-#main .calendar .bottom .dayDisplay .day .dayMarker.today {
+#main .calendar .bottom .dayDisplay .day.today .dayMarker {
     border-radius: 50%;
     background-color: rgb(255, 94, 0);
     color: #FFFFFF;

@@ -1,4 +1,4 @@
-import * as DisplayEvent from "./displayEvent.js";
+import * as DisplayEvent from "./eventManager.js";
 
 export function setupAddEventBtn() {
     const popupToggleBtn = document.getElementById("addEventBtn");
