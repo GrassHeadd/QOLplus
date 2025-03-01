@@ -100,7 +100,8 @@ thisRoute.post("/", async (request, response) => {
         date: date,
         notes: notes
         //no need exerciseId, supabase will auto generate
-    });
+    }).select();
+    console.log("posted data" + data);
 
     response.status(200).json({ data });
 

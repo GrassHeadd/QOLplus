@@ -58,6 +58,7 @@ async function fetchExerciseDataMonth(date) {
 }
 
 async function postExerciseData(data) {
+    console.log("postExerciseData called");
     try {
         const response = await fetch('http://localhost:3000/exercises', {
         method: 'POST',
@@ -67,8 +68,10 @@ async function postExerciseData(data) {
         },
         body: JSON.stringify(data)
         });
+        console.log("response, postExerciseData", response);
         const responseData = await response.json();
         console.log(responseData);
+        return responseData;
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
     }
@@ -77,21 +80,22 @@ async function postExerciseData(data) {
 
 const submitButton = document.querySelector('#postBtn');
 
-
 submitButton.addEventListener('click', async () => {
     const dateVal = document.getElementById('date').value;
     const exerciseVal = document.getElementById('exercise').value;
-    const detailsVal = document.getElementById('details').value;
+    const exerciseStructure = document.getElementById('details').value;
     const notesVal = document.getElementById('notes').value;
 
 
     const dataToPost = {
-        userId: 1,              // or whatever user ID you have
+        userId: 1,            
         date: dateVal,
         exerciseName: exerciseVal,
-        details: detailsVal,
+        exerciseStructure: exerciseStructure,   
         notes: notesVal
       };
+
+    console.log("POST data:", dataToPost);
 
     const result = await postExerciseData(dataToPost);
     console.log("POST response:", result);
