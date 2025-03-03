@@ -48,7 +48,7 @@ export function setupAddEventBtn() {
         const startTime = startDateUnformatted.split(" ")[0].trim(),
             endTime = endDateUnformatted.split(" ")[0].trim();
 
-        await fetch("http://localhost:3000/events/", {
+        await fetch("https://qo-lplus.vercel.app/events/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
