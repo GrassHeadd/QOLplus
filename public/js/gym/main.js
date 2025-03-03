@@ -18,7 +18,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 async function fetchExerciseDataWeek(date) {
     try {
-        const response = await fetch(`http://localhost:3000/exercises/1/week/${date}`, {
+        const response = await fetch(`https://qo-lplus.vercel.app/exercises/1/week/${date}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ async function fetchExerciseDataWeek(date) {
 
 async function fetchExerciseDataMonth(date) {
     try {
-        const response = await fetch(`http://localhost:3000/exercises/1/month/${date}`, {
+        const response = await fetch(`https://qo-lplus.vercel.app/exercises/1/month/${date}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ async function fetchExerciseDataMonth(date) {
 async function postExerciseData(data) {
     console.log("postExerciseData called");
     try {
-        const response = await fetch('http://localhost:3000/exercises', {
+        const response = await fetch('https://qo-lplus.vercel.app/exercises', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

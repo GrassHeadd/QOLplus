@@ -35,7 +35,7 @@ async function getMonthEvents(userId, dateObj) {
 
         // Live Backend Link: https://qo-lplus.vercel.app/events/...
 
-            await fetch("http://localhost:3000/events/" + userId + "/month/" + dateStr)
+            await fetch("https://qo-lplus.vercel.app/events/" + userId + "/month/" + dateStr)
             .then(async (response) => {
                 await response.json().then(data => {
                     resolve(data.data);
@@ -253,7 +253,7 @@ async function setupEditBtn(event, cardElem, ribbonElems) {
 
 async function setupDeleteBtn(event, cardElem, ribbonElems) {
     cardElem.querySelector(".deleteBtn").addEventListener("click", async () => {
-        await fetch("http://localhost:3000/events/" + event.eventId, {
+        await fetch("https://qo-lplus.vercel.app/events/" + event.eventId, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
