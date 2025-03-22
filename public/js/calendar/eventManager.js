@@ -8,34 +8,41 @@ const catColors = {};
 
 // Logic for loading all events progressively
 export async function loadAllEvents(userId = 1) {
-    // Load current month's events
-    await getMonthEvents(userId, new Date("2025-2-1"))
-    .then(monthEvents => {
-        const weekMap = splitMonthEventsToWeeks(monthEvents);
-        
-        // Generate color for each category, if it doesn't already exist
-        monthEvents.forEach(event => {
-            generateCategoryColor(event);
-        });
+    const calRange = Calendar.getCalendarViewableRange();
+    const curDate = new Date(calRange.minDate.getTime()), endDate = calRange.maxDate;
 
-        // Call rendering one week at a time for the month
-        for (var i = 0; i < 6; i++) {
-            const week = weekMap[i], weekEvents = week.events;
-            if (weekEvents.length > 0) displayWeekEvents(week.weekStart, week.weekEnd, weekEvents);
-        }
-    });
-    
-    // TODO: Load +1 and -1 months' events until limit of calendar view
-} 
+    while (curDate.getTime() <= endDate.getTime()) {
+        // Load current month's events
+        await getMonthEvents(userId, curDate)
+            .then(monthEvents => {
+                const weekMap = splitMonthEventsToWeeks(monthEvents);
+                if (Object.keys(weekMap).length > 0) {
+
+                    // Generate color for each category, if it doesn't already exist
+                    monthEvents.forEach(event => {
+                        generateCategoryColor(event);
+                    });
+
+                    // Call rendering one week at a time for the month
+                    for (var i = 0; i < 6; i++) {
+                        const week = weekMap[i], weekEvents = week.events;
+                        if (weekEvents.length > 0) displayWeekEvents(week.weekStart, week.weekEnd, weekEvents);
+                    }
+                }
+            });
+
+        // Increment to the next month
+        curDate.setMonth(curDate.getMonth() + 1);
+    }
+}
 
 // Fetches events for 1 month
 async function getMonthEvents(userId, dateObj) {
     return new Promise(async (resolve, reject) => {
         const dateStr = DateUtils.getDateStrForBackend(dateObj);
-
         // Live Backend Link: https://qo-lplus.vercel.app/events/...
 
-            await fetch("https://qo-lplus.vercel.app/events/" + userId + "/month/" + dateStr)
+        await fetch("https://qo-lplus.vercel.app/events/" + userId + "/month/" + dateStr)
             .then(async (response) => {
                 await response.json().then(data => {
                     resolve(data.data);
@@ -52,9 +59,9 @@ async function getMonthEvents(userId, dateObj) {
 
 // Splits a month's events into array of weeks rows
 function splitMonthEventsToWeeks(monthEvents) {
-    if (monthEvents.length == 0) return monthEvents;
     const weeks = {};
-    
+    if (monthEvents.length == 0) return weeks;
+
     // 1. Begin with the first day of first week (which can go into previous month)
     const curDate = new Date(monthEvents[0].startDate);
     curDate.setDate(1); // Find first day of the month
@@ -65,7 +72,7 @@ function splitMonthEventsToWeeks(monthEvents) {
     // Events fetched in this month can absolutely span outside the 6 weeks but we just let the other months handle the rendering if it does
     for (var i = 0; i < 6; i++) {
         const week = [];
-        
+
         // Calculate the sunday of the week (range end)
         const curSunday = new Date(curDate);
         curSunday.setDate(curSunday.getDate() + 6);
@@ -89,7 +96,7 @@ function splitMonthEventsToWeeks(monthEvents) {
             return eventSlice;
         });
         // StartDate and EndDate are to detect if any event has any next/previous weeks
-        weeks[i] = { weekStart: curDate, weekEnd: curSunday, events: weekEvents};
+        weeks[i] = { weekStart: curDate, weekEnd: curSunday, events: weekEvents };
 
         curDate.setDate(curDate.getDate() + 7); // Increment to next week's monday
     }
@@ -113,7 +120,7 @@ function cloneEvent(event) {
 
 function displayWeekEvents(weekStart, weekEnd, weekEvents) {
     const ribbons = Calendar.renderWeekRibbons(weekStart, weekEnd, weekEvents, catColors);
-    
+
 }
 
 export function displayEvent(event) {
@@ -189,22 +196,22 @@ function linkCardAndRibbons(itinCardElem, ribbonElems) {
 
 async function setupEditBtn(event, cardElem, ribbonElems) {
     const moreBtn = cardElem.querySelector(".moreBtn"),
-          moreBtnPopup = cardElem.querySelector(".moreBtnPopup"),
-          editBtnPopup = cardElem.querySelector(".editBtnPopup"),
-          confirmEditBtn = editBtnPopup.querySelector(".confirmBtn"),
-          cancelEditBtn = editBtnPopup.querySelector(".cancelBtn");
+        moreBtnPopup = cardElem.querySelector(".moreBtnPopup"),
+        editBtnPopup = cardElem.querySelector(".editBtnPopup"),
+        confirmEditBtn = editBtnPopup.querySelector(".confirmBtn"),
+        cancelEditBtn = editBtnPopup.querySelector(".cancelBtn");
 
     const startTimeInput = cardElem.querySelector("#itemStartTimeInput"),
-          endTimeInput = cardElem.querySelector("#itemEndTimeInput"),
-          titleInput = cardElem.querySelector("#itemTitleInput"),
+        endTimeInput = cardElem.querySelector("#itemEndTimeInput"),
+        titleInput = cardElem.querySelector("#itemTitleInput"),
         //   locInput = cardElem.querySelector("#itemLocInput"),
-          infoInput = cardElem.querySelector("#itemInfoInput");
+        infoInput = cardElem.querySelector("#itemInfoInput");
 
     const startTimeText = cardElem.querySelector(".startTime"),
-          endTimeText = cardElem.querySelector(".endTime"),
-          titleText = cardElem.querySelector(".title"),
+        endTimeText = cardElem.querySelector(".endTime"),
+        titleText = cardElem.querySelector(".title"),
         //   locText = cardElem.querySelector(".location"),
-          infoText = cardElem.querySelector(".info");
+        infoText = cardElem.querySelector(".info");
 
     // On edit, swap to edit view with input fields and edit popup icons
     cardElem.querySelector(".editBtn").addEventListener("click", () => {
@@ -261,19 +268,19 @@ async function setupDeleteBtn(event, cardElem, ribbonElems) {
             },
         }).then(async (response) => {
             await response.json()
-            .then(data => {  
-                if (response.status !== 200) {
-                    console.log("Error while deleting event:", data.error);
-                    window.alert(data.error);
-                    return;
-                }
+                .then(data => {
+                    if (response.status !== 200) {
+                        console.log("Error while deleting event:", data.error);
+                        window.alert(data.error);
+                        return;
+                    }
 
-                ItinSummary.updateItinCategory(event, catColors[event.category], -1);
-                cardElem.remove();
-                ribbonElems.forEach(ribbonElem => {
-                    ribbonElem.remove();
+                    ItinSummary.updateItinCategory(event, catColors[event.category], -1);
+                    cardElem.remove();
+                    ribbonElems.forEach(ribbonElem => {
+                        ribbonElem.remove();
+                    });
                 });
-            });
         }).catch(error => {
             console.log("Catching error message");
             console.error("Error:", error.message);

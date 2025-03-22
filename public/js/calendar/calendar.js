@@ -1,12 +1,42 @@
 import * as DateUtils from "../utils/date.js";
 
-const weekMap = {};
+/* Format
+    {
+        2024: {
+            2: { // monthIndex + 1
+                1: { // Day Of Month
+                    0: { // Ribbon Index
+                        eventId: 3, // Event ID
+                        startTime: 1000,
+                    }  
+                },
+                2: {
+                    1: {
+                        eventId: 4,
+                        startTime: 1200
+                    },
+                    3: {
+                    }
+                },
+                ...
+            },
+            ...
+        },
+        ...
+    }
+*/
+const ribbonRenderOrderMap = {};
+var calMinDate, calMaxDate;
 
+/* =====[ CALENDAR CREATION ]===== */
 export function loadInitialMonths(plusMinusAmt) {
     // No arguments in Date constructor = today's date
     // Using 0 as "day" automatically sets the date to the last day of the previous month, hence some currMonthIndex + 1
     const currMonthDate = new Date(), currYear = currMonthDate.getFullYear(), currMonthIndex = currMonthDate.getMonth();
     const currMonthStartDate = new Date(currYear, currMonthIndex, 1), startMonthDate = new Date(currYear, currMonthIndex - plusMinusAmt, 1), endMonthDate = new Date(currYear, currMonthIndex + plusMinusAmt + 1, 0);
+
+    calMinDate = new Date(startMonthDate.getTime());
+    calMaxDate = new Date(endMonthDate.getTime());
 
     // dowOfFdom = Day of week of the first day of start month
     // Date.getDay() returns 0-6 Sunday to Monday, so this formula converts it to 1-7 Monday to Sunday for convenience
@@ -52,12 +82,18 @@ function addDayElement(calendarArea, dateObj) {
 // Creates HTML string for a day element, given a Date object
 function createDayElementHTMLStr(dateObj) {
     return "<div class=\"day " + dateObj.toDateString().replaceAll(" ", "") + "\">" +
-           "   <div class=\"date dayMarker\">" + dateObj.getDate() + "</div>" +
-           "</div>";
+        "   <div class=\"date dayMarker\">" + dateObj.getDate() + "</div>" +
+        "   <div class=\"ribbons\"></div>" +
+        "</div>";
+}
+
+// Get min and max dates for the calendar's view for event fetching / preventing out of bound logic
+export function getCalendarViewableRange() {
+    return { minDate: calMinDate, maxDate: calMaxDate};
 }
 
 
-/* =====[ EVENTS ]===== */
+/* =====[ EVENT RIBBONS ]===== */
 export function spawnRibbonsForAllEvents(events, catColors) {
     const ribbonElemSet = [];
 
@@ -68,6 +104,7 @@ export function spawnRibbonsForAllEvents(events, catColors) {
     return ribbonElemSet;
 }
 
+// Can be called multiple time for the overlapping weeks when rendering adjacent months
 export function renderWeekRibbons(weekStart, weekEnd, weekEvents, catColors) {
     /* 
         Render order logic:
@@ -78,7 +115,7 @@ export function renderWeekRibbons(weekStart, weekEnd, weekEvents, catColors) {
             - E.g. Event spans Mon-Wed, Mon has no events, Tue has 1 event before cur event, Wed has 3 events after cur event, then it will render at index 1
     */
 
-    const ribbonMap = {}, dayMap = [[], [], [], [], [], [], []];
+    const ribbonMap = {};
 
     // Sort all events across the week by start time
     weekEvents.sort((event1, event2) => {
@@ -89,51 +126,70 @@ export function renderWeekRibbons(weekStart, weekEnd, weekEvents, catColors) {
 
     // Calculate the index that a ribbon should be placed, then render it using that index
     weekEvents.forEach(event => {
-        const lowestIndex = getLowestIndexWithinRange(event, dayMap);
-        setRibbonIndexForRange(event, dayMap, lowestIndex);
+        const startDate = new Date(event.startDate), endDate = new Date(event.endDate);
 
-        const dayIndex = event.startDate.getDay() == 0 ? 6 : event.startDate.getDay() - 1;
-        const ribbons = spawnEventRibbons(event, lowestIndex, dayMap[dayIndex], catColors[event.category]);
-        ribbonMap[event.eventId] = ribbons;
+        // If event is already rendered (by previous months), skip
+        if (isEventAlreadyRendered(event, startDate)) return;
+
+        if (startDate.getTime() > calMinDate.getTime() && endDate.getTime() < calMaxDate.getTime()) {
+            const lowestIndex = getLowestIndexWithinWeek(event);
+            setRibbonIndexForRange(event, lowestIndex);
+
+            const dayIndex = event.startDate.getDay() == 0 ? 6 : event.startDate.getDay() - 1;
+
+            const ribbons = spawnEventRibbons(event, lowestIndex, ribbonRenderOrderMap[startDate.getFullYear() + ""][startDate.getMonth() + 1][startDate.getDate()], catColors[event.category]);
+            ribbonMap[event.eventId] = ribbons;
+        }
     });
 
     return ribbonMap;
 }
 
 // Register a ribbon's render index for each day it occurs in (so other ribbons cannot use it)
-function setRibbonIndexForRange(event, dayMap, index) {
+function setRibbonIndexForRange(event, index) {
     var curDate = new Date(event.startDate.getTime());
-    for (var curDay = curDate.getDay() == 0 ? 6 : curDate.getDay() - 1; curDay < 7; curDay++) {
-        dayMap[curDay][index] = index;
+    // For every day that the event occurs in the week, register the event in the ribbonRenderOrderMap
+    for (var i = 7 - (curDate.getDay() == 0 ? 6 : curDate.getDay() - 1); i > 0; i--) {
+        const yearStr = curDate.getFullYear() + "", monthStr = (curDate.getMonth() + 1) + "", dayOfMonthStr = curDate.getDate() + "";
+        if (ribbonRenderOrderMap[yearStr] == undefined) ribbonRenderOrderMap[yearStr] = {};
+        if (ribbonRenderOrderMap[yearStr][monthStr] == undefined) ribbonRenderOrderMap[yearStr][monthStr] = {};
+        if (ribbonRenderOrderMap[yearStr][monthStr][dayOfMonthStr] == undefined) ribbonRenderOrderMap[yearStr][monthStr][dayOfMonthStr] = {};
+        ribbonRenderOrderMap[yearStr][monthStr][dayOfMonthStr][index] = { eventId: event.eventId, startTime: event.startTime };
+        curDate.setDate(curDate.getDate() + 1);
     }
 }
 
+function isEventAlreadyRendered(event, startDate) {
+    if (ribbonRenderOrderMap[startDate.getFullYear() + ""] == undefined) return false;    
+    if (ribbonRenderOrderMap[startDate.getFullYear() + ""][startDate.getMonth() + 1] == undefined) return false;    
+    if (ribbonRenderOrderMap[startDate.getFullYear() + ""][startDate.getMonth() + 1][startDate.getDate()] == undefined) return false;    
+    for (var index in ribbonRenderOrderMap[startDate.getFullYear() + ""][startDate.getMonth() + 1][startDate.getDate()]) {
+        if (ribbonRenderOrderMap[startDate.getFullYear() + ""][startDate.getMonth() + 1][startDate.getDate()][index].eventId == event.eventId) return true;
+    }
+    return false;
+}
+
 // Gets the lowest index that a ribbon can be placed given its occurence range
-function getLowestIndexWithinRange(event, weekArray) {
-    var highestIndex = -1, curDate = new Date(event.startDate.getTime()), endDay = event.endDate.getDay() == 0 ? 6 : event.endDate.getDay() - 1;
+function getLowestIndexWithinWeek(event) {
+    var highestIndex = -1, curDate = new Date(event.startDate.getTime());
     // Return the lowest index across all days the event occurs in
-    for (var curDay = curDate.getDay() == 0 ? 6 : curDate.getDay() - 1; curDay <= endDay; curDay++) {
-        const lowestIndexForCurDay = getLowestIndexForDay(event, weekArray[curDay]);
+    for (var i = 7 - (curDate.getDay() == 0 ? 6 : curDate.getDay() - 1); i > 0; i--) {
+        const lowestIndexForCurDay = getLowestIndexForDay(curDate.getFullYear(), curDate.getMonth() + 1, curDate.getDate());
         if (highestIndex == -1 || lowestIndexForCurDay > highestIndex) highestIndex = lowestIndexForCurDay;
+        curDate.setDate(curDate.getDate() + 1);
     }
     return highestIndex;
 }
 
-// Gets the multiplier for marginTop for a ribbon, given its index (e.g. index 4, highest index before it is 2, multiplier is 4-2 = 2)
-function getRibbonMarginTopMultiplier(event, index, dayArray) {
-    var highestBeforeIndex = 0;
-    dayArray.forEach(eachIndex => {
-        if (eachIndex < index && eachIndex > highestBeforeIndex) highestBeforeIndex = eachIndex;
-    });
-    return index - highestBeforeIndex;
-}
-
 // Gets the lowest index that a ribbon can be placed for a specific day
-function getLowestIndexForDay(event, dayArray) {
+function getLowestIndexForDay(year, month, dayOfMonth) {
+    if (ribbonRenderOrderMap[year] == undefined || ribbonRenderOrderMap[year][month] == undefined || ribbonRenderOrderMap[year][month][dayOfMonth] == undefined) return 0;
+    const dayMap = ribbonRenderOrderMap[year][month][dayOfMonth];
     var index = 0;
-    if (dayArray.length == 0) return index;
+    if (dayMap.length == 0) return index;
     while (true) {
-        if (dayArray.find(eachIndex => eachIndex == index) != undefined) {
+        // If index already exists, increment
+        if (dayMap[index] != undefined) {
             index++;
             continue;
         }
@@ -141,22 +197,39 @@ function getLowestIndexForDay(event, dayArray) {
     }
 }
 
+// Gets the marginTop CSS for a ribbon, given its index
+function getRibbonMarginTopCSS(event, index, dayArray) {
+    var highestBeforeIndex = 0;
+    for (const eachIndex in dayArray) {
+        if (eachIndex < index && eachIndex > highestBeforeIndex) highestBeforeIndex = eachIndex;
+    }
+    // 3 cases: Ribbons before this in same box, Ribbons before this in other box, First ribbon in box
+    if (highestBeforeIndex == 0 && index == 0) return "0";
+    if (highestBeforeIndex == 0) {
+        // Index means how many ribbon spaces it should skip
+        // 11% for height, 8px for both top and bottom padding of each ribbon, 7px for spacing between ribbons
+        // (unsure why it's 8 for padding since CSS says 5px top and bottom which adds up to 10, :/)
+        return "calc(" + (index * 11) + "% + " + (7 + index * 8) + "px)";
+    }
+    return "calc(" + ((index - highestBeforeIndex - 1) * 11) + "% + " + ((index - highestBeforeIndex - 1) * 7 + (index - highestBeforeIndex) * 8) + "px)";
+}
+
 export function spawnEventRibbons(event, index, weekArray, catColor) {
     const startDateObj = new Date(event.startDate), endDateObj = new Date(event.endDate);
     const totalDaysLeft = DateUtils.getDayNumBetween(startDateObj, endDateObj); // Total number of days the event spans across
-    const marginTopMult = getRibbonMarginTopMultiplier(event, index, weekArray);
+    const marginTopMult = getRibbonMarginTopCSS(event, index, weekArray);
 
-    const firstRowRibbon = spawnEventRibbon(getDayElement(startDateObj), event, totalDaysLeft, catColor, !event.hasPrevious, !event.hasNext, marginTopMult);
+    const firstRowRibbon = spawnEventRibbon(getDayRibbonListElement(startDateObj), event, totalDaysLeft, catColor, !event.hasPrevious, !event.hasNext, marginTopMult);
     return firstRowRibbon;
 }
 
-function spawnEventRibbon(dayElem, event, length, catColor, hasLeftMargin, hasRightMargin, marginTopMult) {
+function spawnEventRibbon(ribbonListElem, event, length, catColor, hasLeftMargin, hasRightMargin, marginTop) {
     const ribbonHtmlStr = createRibbonHTMLStr(event);
 
     /* 1. CREATING THE RIBBON ELEMENT */
     // Set up and inject the HTML into the webpage, then retrieve the ribbon for manipulation
-    dayElem.insertAdjacentHTML('beforeend', ribbonHtmlStr);
-    const allDayEvents = dayElem.querySelectorAll(".eventRibbon"),
+    ribbonListElem.insertAdjacentHTML('beforeend', ribbonHtmlStr);
+    const allDayEvents = ribbonListElem.querySelectorAll(".eventRibbon"),
         ribbonElem = allDayEvents[allDayEvents.length - 1];
 
 
@@ -182,7 +255,8 @@ function spawnEventRibbon(dayElem, event, length, catColor, hasLeftMargin, hasRi
         ? (hasRightMargin ? 28 : 19)
         : (hasRightMargin ? 19 : 8)) + "px)";
 
-    if (marginTopMult > 0) ribbonElem.style.marginTop = "calc(" + (marginTopMult * 22) + "% + " + (27 + (marginTopMult - 1) * 5) + "px";
+    // if (marginTopMult > 0) ribbonElem.style.marginTop = "calc(" + (marginTopMult * 22) + "% + " + (27 + (marginTopMult - 1) * 5) + "px";
+    ribbonElem.style.marginTop = marginTop;
 
     // console.log(marginTopMult, ribbonElem, "");
 
@@ -191,12 +265,12 @@ function spawnEventRibbon(dayElem, event, length, catColor, hasLeftMargin, hasRi
 
 function createRibbonHTMLStr(event) {
     return `<div class="eventRibbon">` +
-           `   <div class="indicator"></div>` +
-           `   <div class="title">${event.title}</div>` +
-           `   <div class="time">${event.startTime}</div>` +
-           `</div>`;
+        `   <div class="indicator"></div>` +
+        `   <div class="title">${event.title}</div>` +
+        `   <div class="time">${event.startTime}</div>` +
+        `</div>`;
 }
 
-function getDayElement(dateObj) {
-    return document.querySelector("#main .calendar .bottom .day." + dateObj.toDateString().replaceAll(" ", ""))
+function getDayRibbonListElement(dateObj) {
+    return document.querySelector("#main .calendar .bottom .day." + dateObj.toDateString().replaceAll(" ", "") + " .ribbons");
 }
