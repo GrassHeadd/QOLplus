@@ -1,12 +1,16 @@
-const catCount = {};
+const curCatElems = [];
 
-export function spawnItinCategories(events, catColors) {
-    events.forEach((event) => {
-        updateItinCategory(event, catColors[event.category], 1);
+function spawnItinCategories(allEvents, catColors) {
+    const catCountMap = {};
+    allEvents.forEach((event) => {
+        catCountMap[event.category] = (catCountMap[event.category] ? catCountMap[event.category] : 0) + 1;
+    });
+    allEvents.forEach((event) => {
+        spawnItinCategory(event.category, catCountMap[event.category], catColors[event.category]);
     });
 }
 
-export function spawnItinCategory(category, count, catColor) {
+function spawnItinCategory(category, count, catColor) {
     // Create the HTML element then retrieve it for manipulation
     const catHtmlString = `<div class="item ${category}">` +
         '   <div class="marker"></div>' +
@@ -21,26 +25,11 @@ export function spawnItinCategory(category, count, catColor) {
     itinSumElem.querySelector("." + category + " .label").style.color = catColor;
 }
 
-export function updateItinCategory(event, catColor, delta) {
-    const amount = (catCount[event.category] ? catCount[event.category] : 0) + delta;
-    if (amount > 0) {
-        catCount[event.category] = amount;
-    } else {
-        delete catCount[event.category];
-    }
+function clearItinCategories() {
+    document.querySelector("#itinSummary").innerHTML = "";
+}
 
-    if (amount > 0) {
-        const categoryElem = document.querySelector("#itinSummary ." + event.category + " .amount");
-        
-        // If the category HTML element doesn't exist yet, create it
-        if (!categoryElem) {
-            spawnItinCategory(event.category, catCount[event.category], catColor);
-            return;
-        }
-
-        categoryElem.innerHTML = amount;
-    } else {
-        const itinCatElem = document.querySelector("#itinSummary ." + event.category);
-        if (itinCatElem) itinCatElem.remove();
-    }
+export function displayDayItineraryCats(dayEvents, catColors) {
+    clearItinCategories();
+    spawnItinCategories(dayEvents, catColors);
 }

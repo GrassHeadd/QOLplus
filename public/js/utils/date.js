@@ -65,6 +65,5 @@ export function getDateObjFromClassName(className) {
 }
 
 export function doesDateOccurInRange(dateObj, startDateObj, endDateObj) {
-    console.log("Checking " + dateObj.toDateString().replace(" ", "") + " against " + startDateObj.toDateString().replace(" ", "") + " and " + endDateObj.toDateString().replace(" ", "") + ": " + dateObj.getTime() + " and " + endDateObj.getTime() + " and " + startDateObj.getTime());
     return dateObj.getTime() >= startDateObj.getTime() && dateObj.getTime() <= endDateObj.getTime();
 }

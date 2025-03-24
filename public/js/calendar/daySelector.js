@@ -1,6 +1,7 @@
 import * as DateUtils from "../utils/date.js";
 import * as Calendar from "./calendar.js";
-import * as ItinList from "./itinList.js"
+import * as ItinList from "./itinList.js";
+import * as EventManager from "./eventManager.js";
 
 // Defaults to today's date
 var selectedDay = new Date();
@@ -26,7 +27,7 @@ export function initListeners(dayElems) {
             Calendar.getDayElement(selectedDay).classList.add("selected");
             
             // Propagate event to itinerary list area
-            ItinList.displayDayItinerary(dateObj);
+            ItinList.displayDayItinerary(dateObj, EventManager.getCategoryColors());
         });
     });
 }

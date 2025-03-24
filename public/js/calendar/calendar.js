@@ -79,6 +79,10 @@ export function indicateCurrentDay() {
     todayElement.classList.add("today");
 }
 
+function clearRibbons() {
+    document.querySelectorAll(".eventRibbon").forEach(ribbon => ribbon.remove());
+}
+
 // Adds a day element to the calendar area and returns the newly created day element
 function addDayElement(calendarArea, dateObj) {
     calendarArea.insertAdjacentHTML('beforeend', createDayElementHTMLStr(dateObj));
@@ -101,6 +105,7 @@ export function getCalendarViewableRange() {
 
 /* =====[ EVENT RIBBONS ]===== */
 export function spawnRibbonsForAllEvents(events, catColors) {
+    clearRibbons();
     const ribbonElemSet = [];
 
     events.forEach(event => {
@@ -270,7 +275,7 @@ function spawnEventRibbon(ribbonListElem, event, length, catColor, hasLeftMargin
 }
 
 function createRibbonHTMLStr(event) {
-    return `<div class="eventRibbon">` +
+    return `<div class="eventRibbon eventId${event.eventId}">` +
         `   <div class="indicator"></div>` +
         `   <div class="title">${event.title}</div>` +
         `   <div class="time">${event.startTime}</div>` +

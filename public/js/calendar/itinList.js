@@ -1,4 +1,6 @@
 import * as EventManager from "./eventManager.js";
+import * as ItinSummary from "./itinSummary.js"
+import * as DeleteEvent from "./deleteEvent.js"
 
 export function spawnEventItinCards(events, catColors) {
     const cardElems = [];
@@ -57,7 +59,7 @@ export function spawnEventItinCard(event, catColor) {
     // Inject the HTML into the page and retrieve the HTML Element object for manipulation
     document.querySelector("#main .inspector .itinerary").insertAdjacentHTML("beforeend", cardHtmlStr);
     const allCardElems = document.querySelector("#main .inspector .itinerary").getElementsByClassName("item"),
-          cardElem = allCardElems[allCardElems.length - 1];
+        cardElem = allCardElems[allCardElems.length - 1];
 
     // Style the card according to its category's color
     cardElem.getElementsByClassName("left")[0].style.backgroundColor = catColor;
@@ -69,6 +71,9 @@ export function spawnEventItinCard(event, catColor) {
         cardElem.querySelector(".moreBtnPopup").classList.toggle("active");
     });
 
+    // Link Delete Btn to delete manager
+    DeleteEvent.initDeleteBtnListener(eventId, cardElem);
+
     return cardElem;
 }
 
@@ -76,13 +81,16 @@ function clearItineraryDisplay() {
     document.querySelector("#main .inspector .itinerary").innerHTML = "";
 }
 
-export function displayDayItinerary(dateObj) {
+export function displayDayItinerary(dateObj, catColors) {
     clearItineraryDisplay();
-    
+
     const dayEvents = EventManager.getEventsInDay(dateObj);
     // Sort by start time first
     // TODO probably more sorting to do, especially for those with no start time
     dayEvents.sort((event1, event2) => event1.startTime - event2.startTime);
 
-    spawnEventItinCards(dayEvents, EventManager.getCategoryColors());
+    spawnEventItinCards(dayEvents, catColors);
+
+    // Propagate event to itinerary summary area
+    ItinSummary.displayDayItineraryCats(dayEvents, catColors);
 }

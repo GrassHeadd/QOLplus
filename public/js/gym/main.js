@@ -18,7 +18,8 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 async function fetchExerciseDataWeek(date) {
     try {
-        const response = await fetch(`https://qo-lplus.vercel.app/exercises/1/week/${date}`, {
+        const response = await fetch(`http://localhost:3000/exercises/1/week/${date}`, {
+        //https://qo-lplus.vercel.app/exercises/1/week/${date}
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -33,7 +34,7 @@ async function fetchExerciseDataWeek(date) {
 
 async function fetchExerciseDataMonth(date) {
     try {
-        const response = await fetch(`https://qo-lplus.vercel.app/exercises/1/month/${date}`, {
+        const response = await fetch(`http://localhost:3000/exercises/1/month/${date}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -60,17 +61,19 @@ async function fetchExerciseDataMonth(date) {
 async function postExerciseData(data) {
     console.log("postExerciseData called");
     try {
-        const response = await fetch('https://qo-lplus.vercel.app/exercises', {
+        await fetch('http://localhost:3000/exercises', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
         body: JSON.stringify(data)
+        }).then(async (response) => {
+                await response.json().then(jsonData => {
+                    console.log("data type: ", typeof(jsonData.data[0].exerciseStructure));
+                    
+            });
         });
-        console.log("response, postExerciseData", response);
-        const responseData = await response.json();
-        console.log(responseData);
         return responseData;
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
@@ -100,3 +103,11 @@ submitButton.addEventListener('click', async () => {
     const result = await postExerciseData(dataToPost);
     console.log("POST response:", result);
 });
+
+async function deleteButton(exerciseId, row) {
+    const deleteButton = document.querySelector("#exerciseId" + exerciseId);
+    deleteButton.addEventListener("click", () => {
+  
+    })
+  
+  }

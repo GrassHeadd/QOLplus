@@ -34,21 +34,21 @@ thisRoute.get("/:userId/:month/:date", async (request, response) => {
   }
   });
 
-thisRoute.get("/:userId/:week/:date", async (request, response) => {
-    try {
-      const userId = request.params.userId;
-      const inputDate = request.params.date;
-      const fromDateStr = DateUtils.getEndOfWeek(inputDate);
-      const endDateStr = DateUtils.getStartOfWeek(inputDate);
+// thisRoute.get("/:userId/:week/:date", async (request, response) => {
+//     try {
+//       const userId = request.params.userId;
+//       const inputDate = request.params.date;
+//       const fromDateStr = DateUtils.getEndOfWeek(inputDate);
+//       const endDateStr = DateUtils.getStartOfWeek(inputDate);
   
-      const { data } = await supabase.from("exercises").select("*").eq("userId", userId).gte("date", fromDateStr).lte("date", endDateStr)
-      response.status(200).json({ data });
+//       const { data } = await supabase.from("exercises").select("*").eq("userId", userId).gte("date", fromDateStr).lte("date", endDateStr)
+//       response.status(200).json({ data });
       
-  } catch (error) {
-      console.error('Error:', error.message);
-      response.status(500).json({ error: 'Internal server error' });
-  }
-  });
+//   } catch (error) {
+//       console.error('Error:', error.message);
+//       response.status(500).json({ error: 'Internal server error' });
+//   }
+//   });
 
 //get all gym data for a user
 thisRoute.get("/:userId", async (request, response) => {

@@ -112,23 +112,9 @@ function splitMonthEventsToWeeks(monthEvents) {
     return weeks;
 }
 
-function cloneEvent(event) {
-    return {
-        eventId: event.eventId,
-        title: event.title,
-        category: event.category,
-        startDate: event.startDate,
-        startTime: event.startTime,
-        endDate: event.endDate,
-        endTime: event.endTime,
-        location: event.location,
-        notes: event.notes
-    };
-}
-
 function displayWeekEvents(weekStart, weekEnd, weekEvents) {
     const ribbons = Calendar.renderWeekRibbons(weekStart, weekEnd, weekEvents, catColors);
-
+    return ribbons;
 }
 
 export function displayEvent(event) {
@@ -266,46 +252,42 @@ async function setupEditBtn(event, cardElem, ribbonElems) {
     });
 }
 
-async function setupDeleteBtn(event, cardElem, ribbonElems) {
-    cardElem.querySelector(".deleteBtn").addEventListener("click", async () => {
-        await fetch("https://qo-lplus.vercel.app/events/" + event.eventId, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-        }).then(async (response) => {
-            await response.json()
-                .then(data => {
-                    if (response.status !== 200) {
-                        console.log("Error while deleting event:", data.error);
-                        window.alert(data.error);
-                        return;
-                    }
-
-                    ItinSummary.updateItinCategory(event, catColors[event.category], -1);
-                    cardElem.remove();
-                    ribbonElems.forEach(ribbonElem => {
-                        ribbonElem.remove();
-                    });
-                });
-        }).catch(error => {
-            console.log("Catching error message");
-            console.error("Error:", error.message);
-        });
-    });
-}
-
-
-
+/* UTILITIES AND GETTERS */
 export function getAllEvents() {
     return allEvents;
 }
 
+export function removeEvent(eventId) {
+    console.log("Before: ", allEvents, " removing " + eventId);
+    const index = allEvents.findIndex(event => event.eventId == eventId);
+    if (index != -1) allEvents.splice(index, 1);
+    console.log("After: ", allEvents);
+}
+
 export function getEventsInDay(dateObj) {
-    return allEvents.filter(event => DateUtils.doesDateOccurInRange(dateObj, new Date(event.startDate), new Date(event.endDate)));
+    return allEvents.filter(event => {
+        const startDate = new Date(event.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(event.endDate);
+        endDate.setHours(0, 0, 0, 0);
+        return DateUtils.doesDateOccurInRange(dateObj, startDate, endDate);
+    });
 }
 
 export function getCategoryColors() {
     return catColors;
+}
+
+function cloneEvent(event) {
+    return {
+        eventId: event.eventId,
+        title: event.title,
+        category: event.category,
+        startDate: event.startDate,
+        startTime: event.startTime,
+        endDate: event.endDate,
+        endTime: event.endTime,
+        location: event.location,
+        notes: event.notes
+    };
 }
