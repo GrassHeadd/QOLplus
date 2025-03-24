@@ -1,4 +1,5 @@
 import * as Calendar from "./calendar.js";
+import * as DaySelector from "./daySelector.js"
 import * as EventManager from "./eventManager.js";
 import * as AddEvent from "./addEvent.js";
 
@@ -6,6 +7,7 @@ import * as AddEvent from "./addEvent.js";
 document.addEventListener("DOMContentLoaded", (domLoadEvent) => {
   Calendar.loadInitialMonths(3);
   Calendar.indicateCurrentDay();
+  DaySelector.initDefaultSelectedDay();
 
   EventManager.loadAllEvents();
 

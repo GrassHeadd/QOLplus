@@ -67,6 +67,42 @@
     border-color: rgb(157, 157, 157) !important;
 }
 
+#main .calendar .bottom .dayDisplay .day.selected {
+    background-color: rgb(255 208 208 / 25%)
+}
+
+#main .calendar .bottom .dayDisplay .day:not(.selected):hover {
+    background-color: rgb(255 208 208 / 10%);
+}
+
+/* Sunday and Saturday will have different background & border color */
+#main .calendar .dayDisplay .day:not(.selected):is(:nth-child(7n + 6), :nth-child(7n + 7)):hover {
+    background-color: rgba(201, 32, 32, 0.153);
+}
+
+
+#main .calendar .bottom .dayDisplay .day.selected .dayMarker {
+    color: white;
+}
+
+#main .calendar .bottom .dayDisplay .day .dayMarker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 21px;
+    height: 21px;
+    position: absolute;
+    z-index: 3;
+    top: 3.85px;
+    right: 2px;
+}
+
+#main .calendar .bottom .dayDisplay .day.today .dayMarker {
+    border-radius: 50%;
+    background-color: rgb(255, 94, 0);
+    color: #FFFFFF;
+}
+
 #main .calendar .dayDisplay .day .ribbons {
     position: absolute;
     z-index: 200;
@@ -138,36 +174,6 @@
     margin-left: 3px;
 }
 
-
-#main .calendar .bottom .dayDisplay .day {
-    position: relative;
-}
-
-#main .calendar .bottom .dayDisplay .day.selected {
-    background-color: rgb(214, 196, 196);
-}
-
-#main .calendar .bottom .dayDisplay .day.selected .dayMarker {
-    color: #5d5c5c
-}
-
-#main .calendar .bottom .dayDisplay .day .dayMarker {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 21px;
-    height: 21px;
-    position: absolute;
-    z-index: 3;
-    top: 3.85px;
-    right: 2px;
-}
-
-#main .calendar .bottom .dayDisplay .day.today .dayMarker {
-    border-radius: 50%;
-    background-color: rgb(255, 94, 0);
-    color: #FFFFFF;
-}
 
 #main .calendar .bottom .dayDisplay .day .events {
     height: calc(100% - 30px);

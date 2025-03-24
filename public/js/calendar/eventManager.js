@@ -5,6 +5,7 @@ import * as ItinList from "./itinList.js";
 import * as Calendar from "./calendar.js";
 
 const catColors = {};
+const allEvents = [];
 
 // Logic for loading all events progressively
 export async function loadAllEvents(userId = 1) {
@@ -15,6 +16,13 @@ export async function loadAllEvents(userId = 1) {
         // Load current month's events
         await getMonthEvents(userId, curDate)
             .then(monthEvents => {
+                // Populate non-duplicates to allEvents array
+                monthEvents.forEach(event => {
+                    if (!allEvents.some(eachEvent => eachEvent.eventId == event.eventId)) {
+                        allEvents.push(event);
+                    }
+                });
+
                 const weekMap = splitMonthEventsToWeeks(monthEvents);
                 if (Object.keys(weekMap).length > 0) {
 
@@ -286,4 +294,18 @@ async function setupDeleteBtn(event, cardElem, ribbonElems) {
             console.error("Error:", error.message);
         });
     });
+}
+
+
+
+export function getAllEvents() {
+    return allEvents;
+}
+
+export function getEventsInDay(dateObj) {
+    return allEvents.filter(event => DateUtils.doesDateOccurInRange(dateObj, new Date(event.startDate), new Date(event.endDate)));
+}
+
+export function getCategoryColors() {
+    return catColors;
 }

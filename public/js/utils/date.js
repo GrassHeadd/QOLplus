@@ -39,3 +39,32 @@ export function doesStartEndOccupyRange(startObj, endObj, rangeStartObj, rangeEn
            (end >= rangeStart && end <= rangeEnd) || // If the end date is within the range
            (start <= rangeStart && end >= rangeEnd); // If the range is within the start and end date
 }
+
+// Converts Date Object into a string meant for className
+// Format is dateIsYYYYMMDD (e.g. dateIs20250327)
+export function getClassNameFromDateObj(dateObj) {
+    const year = dateObj.getFullYear();
+    var month = dateObj.getMonth() + 1;
+    if (month < 10) {
+        month = "0" + month;
+    }
+    var date = dateObj.getDate();
+    if (date < 10) {
+        date = "0" + date;
+    }
+    return "dateIs" + year + month + date;
+}
+
+// Converts className string into Date Object
+export function getDateObjFromClassName(className) {
+    const dateArr = className.replace("dateIs", "");
+    const year = parseInt(dateArr.substring(0, 4));
+    const month = parseInt(dateArr.substring(4, 6));
+    const date = parseInt(dateArr.substring(6, 8));
+    return new Date(year, month - 1, date);
+}
+
+export function doesDateOccurInRange(dateObj, startDateObj, endDateObj) {
+    console.log("Checking " + dateObj.toDateString().replace(" ", "") + " against " + startDateObj.toDateString().replace(" ", "") + " and " + endDateObj.toDateString().replace(" ", "") + ": " + dateObj.getTime() + " and " + endDateObj.getTime() + " and " + startDateObj.getTime());
+    return dateObj.getTime() >= startDateObj.getTime() && dateObj.getTime() <= endDateObj.getTime();
+}

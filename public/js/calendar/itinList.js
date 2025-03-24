@@ -1,3 +1,5 @@
+import * as EventManager from "./eventManager.js";
+
 export function spawnEventItinCards(events, catColors) {
     const cardElems = [];
     events.forEach(event => {
@@ -68,4 +70,19 @@ export function spawnEventItinCard(event, catColor) {
     });
 
     return cardElem;
+}
+
+function clearItineraryDisplay() {
+    document.querySelector("#main .inspector .itinerary").innerHTML = "";
+}
+
+export function displayDayItinerary(dateObj) {
+    clearItineraryDisplay();
+    
+    const dayEvents = EventManager.getEventsInDay(dateObj);
+    // Sort by start time first
+    // TODO probably more sorting to do, especially for those with no start time
+    dayEvents.sort((event1, event2) => event1.startTime - event2.startTime);
+
+    spawnEventItinCards(dayEvents, EventManager.getCategoryColors());
 }

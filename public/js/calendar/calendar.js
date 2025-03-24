@@ -1,4 +1,5 @@
 import * as DateUtils from "../utils/date.js";
+import * as DaySelector from "./daySelector.js"
 
 /* Format
     {
@@ -49,27 +50,32 @@ export function loadInitialMonths(plusMinusAmt) {
     }
 
     // Creation of all date elements between startMonthDate and endMonthDate
+    const dayElems = [];
     while (true) {
         if (startMonthDate.toDateString() == endMonthDateStr) break;
 
-        addDayElement(dayDisplayElem, startMonthDate);
+        const dayElem = addDayElement(dayDisplayElem, startMonthDate);
+        dayElems.push(dayElem);
 
         startMonthDate.setDate(startMonthDate.getDate() + 1);
     }
+    // Pass to DaySelector to register the day selection event
+    DaySelector.initListeners(dayElems);
 
     // Snap to the first day of the current month
-    dayDisplayElem.querySelector("." + currMonthStartDate.toDateString().replaceAll(" ", "")).scrollIntoView();
+    getDayElement(currMonthStartDate).scrollIntoView();
 
     // The default view can only show up to 5 rows, hence we check and move it down by 1 if the current date happens to past the 5th row
     // E.g. 30 September 2024 is on the 6th row of the month
     if (dowOfFirstOfCurrMth - 1 + currMonthDate.getDate() > 35) {
-        dayDisplayElem.getElementsByClassName(new Date(currYear, currMonthIndex, 8).toDateString().replaceAll(" ", ""))[0].scrollIntoView();
+        getDayElement(new Date(currYear, currMonthIndex, 8)).scrollIntoView();
     }
 }
 
 // Finds and styles the day element's marker (i.e. orange circle) to indicate the current day
 export function indicateCurrentDay() {
-    const todayElement = document.querySelector("#main .calendar .bottom .day." + new Date().toDateString().replaceAll(" ", ""));
+    const todayDateClassName = DateUtils.getClassNameFromDateObj(new Date());
+    const todayElement = document.querySelector("#main .calendar .bottom .day." + todayDateClassName);
     todayElement.classList.add("today");
 }
 
@@ -81,7 +87,7 @@ function addDayElement(calendarArea, dateObj) {
 
 // Creates HTML string for a day element, given a Date object
 function createDayElementHTMLStr(dateObj) {
-    return "<div class=\"day " + dateObj.toDateString().replaceAll(" ", "") + "\">" +
+    return "<div class=\"day " + DateUtils.getClassNameFromDateObj(dateObj) + "\">" +
         "   <div class=\"date dayMarker\">" + dateObj.getDate() + "</div>" +
         "   <div class=\"ribbons\"></div>" +
         "</div>";
@@ -271,6 +277,11 @@ function createRibbonHTMLStr(event) {
         `</div>`;
 }
 
+export function getDayElement(dateObj) {
+    return document.querySelector("#main .calendar .bottom .day." + DateUtils.getClassNameFromDateObj(dateObj));
+}
+
 function getDayRibbonListElement(dateObj) {
-    return document.querySelector("#main .calendar .bottom .day." + dateObj.toDateString().replaceAll(" ", "") + " .ribbons");
+    if (!getDayElement(dateObj)) return null; 
+    return getDayElement(dateObj).querySelector(".ribbons");
 }
