@@ -4,16 +4,27 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "npm start",
+    "dev": "vite serve ./public",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
     "@supabase/supabase-js": "^2.47.6",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "datejs": "^1.0.0-rc3",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.26.3",
+    "vite": "^6.2.3"
   }
 }
