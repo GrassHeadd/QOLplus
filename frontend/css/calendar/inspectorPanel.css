@@ -1,0 +1,6 @@
+/*=== Left Inspector Panel ===*/
+#inspectorPanel {
+    width: 30%;
+    height: 100%;
+    display: flex;
+}
