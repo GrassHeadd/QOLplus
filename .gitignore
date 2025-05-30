@@ -1,2 +1,42 @@
 /node_modules/
 .env
+
+# Virtual Environment
+/django_backend/venv/
+/django_backend/.env
+
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Django specific
+*.log
+*.pot
+db.sqlite3
+db.sqlite3-journal
+/django_backend/media/
+/django_backend/static/
+/django_backend/staticfiles/
+
+# Keep migrations directory but ignore compiled Python files in migrations
+/django_backend/app/*/migrations/*.py
+!django_backend/app/*/migrations/__init__.py
+
+# Local development settings
+/django_backend/app/local_settings.py
+
+# Coverage reports
+/django_backend/htmlcov/
+/django_backend/.coverage
+/django_backend/.coverage.*
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Mac OS specific
+.DS_Store
