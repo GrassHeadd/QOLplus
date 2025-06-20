@@ -1,7 +1,7 @@
 /*=== Inspector Resizer ===*/
 #inspectorPanel .resizer {
   position: relative;
-  width: 30px;
+  width: 13px;
   height: 100%;
   background-color: #373a3f;
   cursor: col-resize;
