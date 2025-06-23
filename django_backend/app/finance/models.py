@@ -9,7 +9,7 @@ class Expense(models.Model):
     expenseName = models.CharField(max_length=255)
     amount = models.FloatField()
     category = models.CharField(max_length=100)
-    userId = models.ForeignKey(User, on_delete=models.CASCADE, db_column='userId')  # Added db_column
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='user_id')  # Added db_column
     date = models.DateField()
     notes = models.TextField(null=True, blank=True)
     
