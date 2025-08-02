@@ -1,0 +1,54 @@
+#calendarGrid {
+  background-color: gray;
+
+  width: 100%;
+  height: calc(100% - 20px);
+  overflow-y: scroll;
+
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+}
+
+#calendarGrid .gridCell {
+  /* aspect-ratio: auto 1 / 1; */
+  position: relative;
+
+  text-align: end;
+  padding-right: 5px;
+  border-left: 1px solid rgb(73, 73, 73);
+  border-top: 1px solid rgb(73, 73, 73);
+}
+
+#calendarGrid .gridCell:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#calendarGrid .gridCell .border {
+  position: absolute;
+  top: -1%;
+  left: -1%;
+  width: 102%;
+  height: 102%;
+  border: none;
+}
+
+/* width */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Track */
+/* ::-webkit-scrollbar-track { */
+/* background: #f1f1f1; */
+/* } */
+
+/* Handle */
+/* ::-webkit-scrollbar-thumb { */
+/* background: #888; */
+/* } */
+
+/* Handle on hover */
+/* ::-webkit-scrollbar-thumb:hover { */
+/* background: #555; */
+/* } */

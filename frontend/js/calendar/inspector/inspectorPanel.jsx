@@ -2,14 +2,23 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 
 import Inspector from "./inspector.jsx";
-import Resizer from "./inspector/resizer.jsx";
+import Resizer from "./resizer.jsx";
 
 export default function InspectorPanel() {
+    /* Global Variables */
+    const [minWidth, setMinWidth] = useState(-1);
+    const [maxWidth, setMaxWidth] = useState(-1);
     const [isResizing, setIsResizing] = useState(false);
     const [cursorX, setCursorX] = useState(-1);
     const [initCursorInInspRatio, setInitCursorInInspRatio] = useState(-1); // Default ratio of inspector panel width to page width
     const [prevCursorOnPagePerc, setPrevCursorOnPagePerc] = useState(-1); // Default ratio of inspector panel width to page width
     const [panelWidth, setPanelWidth] = useState(30);
+
+    // On Component Mount
+    useEffect(() => {
+        setMinWidth(parseInt(document.defaultView.getComputedStyle(document.querySelector("#inspectorPanel")).minWidth.replace("%", "")));
+        setMaxWidth(parseInt(document.defaultView.getComputedStyle(document.querySelector("#inspectorPanel")).maxWidth.replace("%", "")));
+    }, []);
 
     // Calls function upon any change to cursorX (which is updated by Resizer child component)
     useEffect(() => {
@@ -23,9 +32,9 @@ export default function InspectorPanel() {
         }
     }, [isResizing]);
 
-    function calculatePanelWidth(cursorX, minWidth = 20, maxWidth = 50) {
+    function calculatePanelWidth(cursorX) {
         // Prevent trigger in recalculation on page load which overrides default panel width
-        if (cursorX === -1) return;
+        if (cursorX == -1) return;
         if (!isResizing) return;
 
         const pageWidth = parseInt(document.defaultView.getComputedStyle(document.querySelector("body")).width);
