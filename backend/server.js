@@ -7,10 +7,10 @@ const cors = require("cors");
 dotenv.config();
 
 // Individual sub-files
-const events = require("./backend/routing/events.js");
-const exercises = require("./backend/routing/exercises.js");
+const events = require("./routing/events.js");
+const exercises = require("./routing/exercises.js");
 // const food = require("./backend/routing/food.js");
-const expenses = require("./backend/routing/expenses.js");
+const expenses = require("./routing/expenses.js");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
