@@ -23,11 +23,6 @@ app.use("/exercises", exercises);
 // app.use("/food", food);
 app.use("/expenses", expenses);
 
-module.exports = (request, response) => {
-    app(request, response);
-}
-
-
 // Format: YYYYMMDD
 //TODO
 function formatDate(dateObj) {
@@ -43,4 +38,8 @@ function formatTime(dateObj) {
     if (hour < 10) hour = "0" + hour;
     if (min < 10) min = "0" + min;
     return hour + "" + min;
+}
+
+module.exports = (request, response) => {
+    app(request, response);
 }
