@@ -1,3 +1,3 @@
-const app = require("../backend/server.js");
+const { appHandler } = require("../backend/server.js");
 
-module.exports = app;
+module.exports = appHandler;

@@ -23,9 +23,9 @@ app.use("/exercises", exercises);
 // app.use("/food", food);
 app.use("/expenses", expenses);
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+module.exports = (request, response) => {
+    app(request, response);
+}
 
 
 // Format: YYYYMMDD
