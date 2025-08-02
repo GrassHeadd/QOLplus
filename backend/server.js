@@ -18,10 +18,10 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use("/events", events);
-app.use("/exercises", exercises);
+app.use("/api/events", events);
+app.use("/api/exercises", exercises);
 // app.use("/food", food);
-app.use("/expenses", expenses);
+app.use("/api/expenses", expenses);
 
 // Format: YYYYMMDD
 //TODO
