@@ -23,4 +23,8 @@ app.use("/api/exercises", exercises);
 // app.use("/food", food);
 app.use("/api/expenses", expenses);
 
+app.get("/api/hello", (req, res) => {
+  res.status(200).json({ message: "Hello from server!" });
+});
+
 module.exports = app;

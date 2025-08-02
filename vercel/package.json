@@ -12,6 +12,7 @@
         "cors": "^2.8.5",
         "datejs": "^1.0.0-rc3",
         "dotenv": "^16.4.7",
-        "express": "^4.21.2"
+        "express": "^4.21.2",
+        "serverless-http": "^3.2.0"
     }
 }
