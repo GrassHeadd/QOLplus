@@ -1,6 +1,7 @@
 {
     "name": "qolplus",
     "version": "1.0.0",
+    "main": "./api/index.js",
     "scripts": {
         "build-frontend": "cd ../frontend && npm install && npm run build && cd ../vercel",
         "build-backend": "npm install",
