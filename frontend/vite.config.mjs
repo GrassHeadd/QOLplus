@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   root: ".",  // Root directory of the project
   build: {
-    outDir: "../public",  // Directory for the production build
+    outDir: "../vercel/public",  // Directory for the production build
   },
   plugins: [
     tailwindcss(),  // Tailwind CSS plugin for Vite
