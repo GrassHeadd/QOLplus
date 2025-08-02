@@ -41,5 +41,6 @@ function formatTime(dateObj) {
 }
 
 module.exports = (request, response) => {
+    console.log(`Received request: ${request.method} ${request.url}`);
     app(request, response);
 }
