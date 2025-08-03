@@ -3,8 +3,9 @@
     "version": "1.0.0",
     "scripts": {
         "build-frontend": "cd ../frontend && npm install && npm run build && cd ../vercel",
-        "build-backend": "npm install",
-        "build": "npm run build-frontend && npm run build-backend"
+        "build-backend": "cd ../backend && npm install && cd ../vercel",
+        "build-vercel": "npm install",
+        "build": "npm run build-frontend && npm run build-backend && npm run build-vercel"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.47.6",
