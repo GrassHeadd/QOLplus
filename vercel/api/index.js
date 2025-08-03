@@ -1,18 +1,25 @@
 const express = require("express");
-const serverless = require("serverless-http");
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const cors = require("cors");
+
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-app.get("/hello", (req, res) => {
-  console.log("✅ Reached /hello route");
-  res.status(200).json({ message: "Hello from Express!" });
+app.use(bodyParser.json());
+app.use(cors());
+
+app.get("/api/hello", (req, res) => {
+  res.status(200).json({ message: "Hello from server!" });
 });
 
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Root of Express in /api" });
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
-module.exports = serverless(app);
+module.exports = app;
 
 // module.exports = (request, response) => {
 //   if (request.method === "GET") {
