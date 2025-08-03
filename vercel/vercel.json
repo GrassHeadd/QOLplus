@@ -2,7 +2,8 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "description": "API endpoint for QOLplus"
+        "maxDuration": 10,
+        "memory": 512
     }
   },
   "builds": [
