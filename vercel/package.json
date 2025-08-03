@@ -2,8 +2,8 @@
     "name": "qolplus",
     "version": "1.0.0",
     "scripts": {
-        "build-frontend": "cd ../frontend && npm install && npm list && npm run build && cd ../vercel",
-        "build-backend": "npm install && npm list && ls -al",
+        "build-frontend": "cd ../frontend && npm install && npm run build && cd ../vercel",
+        "build-backend": "npm install",
         "build": "npm run build-frontend && npm run build-backend"
     },
     "dependencies": {
@@ -12,7 +12,6 @@
         "cors": "^2.8.5",
         "datejs": "^1.0.0-rc3",
         "dotenv": "^16.4.7",
-        "express": "^4.21.2",
-        "serverless-http": "^3.2.0"
+        "express": "^4.21.2"
     }
 }
