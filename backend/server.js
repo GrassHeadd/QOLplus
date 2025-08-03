@@ -1,4 +1,5 @@
 const express = require("express");
+const serverless = require("serverless-http");
 // const bodyParser = require("body-parser");
 // const dotenv = require("dotenv");
 const cors = require("cors");
@@ -27,4 +28,4 @@ app.get("/api/hello", (req, res) => {
   res.status(200).json({ message: "Hello from server!" });
 });
 
-module.exports = app;
+module.exports = serverless(app);
