@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "build-frontend": "cd ../frontend && npm install && npm list && npm run build && cd ../vercel",
-        "build-backend": "npm install && npm list",
+        "build-backend": "npm install && npm list && ls -al",
         "build": "npm run build-frontend && npm run build-backend"
     },
     "dependencies": {
