@@ -1,16 +1,16 @@
 const express = require("express");
+const serverless = require("serverless-http");
 const cors = require("cors");
 
 const app = express();
 app.use(cors());
 
-app.get("/api/hello", (req, res) => {
-  res.status(200).json({ message: "Hello from server!" });
+app.get("/hello", (req, res) => {
+  console.log("Hit /hello route!");
+  res.status(200).json({ message: "OK" });
 });
 
-module.exports = (request, response) => {
-  app(request, response);
-};
+module.exports = serverless(app);
 
 // module.exports = (request, response) => {
 //   if (request.method === "GET") {
