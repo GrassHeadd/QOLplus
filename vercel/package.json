@@ -2,10 +2,9 @@
     "name": "qolplus",
     "version": "1.0.0",
     "scripts": {
-        "build-frontend": "cd ../frontend && npm install && npm run build && cd ../vercel",
-        "build-backend": "npm install",
-        "build-vercel": "npm install",
-        "build": "npm run build-frontend && npm run build-backend && npm run build-vercel"
+        "build-frontend": "cd ../frontend && npm install && npm list && npm run build && cd ../vercel",
+        "build-backend": "npm install && npm list",
+        "build": "npm run build-frontend && npm run build-backend"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.47.6",
