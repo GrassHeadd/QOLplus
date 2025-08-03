@@ -69,7 +69,7 @@ thisRoute.get("/:userId/:eventId", async (request, response) => {
     const userId = request.params.userId;
     const eventId = request.params.eventId;
 
-    await supabase.from("events").select("*").eq("userId", userId).eq("eventId", eventId)
+    await supabase.from("events").select("*").eq("use_iId", userId).eq("eventId", eventId)
     .then(queryResponse => {
         if (queryResponse.error) {
             response.status(500).json({ "error": queryResponse.error.message });
